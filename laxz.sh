@@ -1,11 +1,6 @@
 #!/bin/bash
 
-timestamp() {
-  date +"%x%T"
-}
-
 help_func(){
-    timestamp
     echo "-h , --help , print this help message and exit."
     echo "-b, --brightness, change screen brightness (0.5 to 1.4)."
     echo "-i , --internet , check internet."
@@ -28,16 +23,25 @@ update(){
     sudo apt update
     read -p 'do you want to upgrade: y/n ' uservar
     if [ $uservar == 'y' ]; then
-        echo "upgrade"
+        echo "upgrade" #TODO
     else
         echo "user aborded."
     fi
 }
 
+encryptor(){
+    echo "---enCRYption---"
+    echo "$1"
+}
 
-enc_fun(){
-    echo "AES enCRYption"
-    zip -r ~/lxz-$(date +"%x-%T")-$1.zip $1
+zipper(){
+    timenow=$(date +"%Y-%m-%d-%T")
+    echo "---zip---"
+    zip -r /home/$USER/laxz-$timenow.zip $*
+    read -p 'do you want to encrypt: y/n ' uservar
+    if [ $uservar == 'y' ]; then
+        encryptor /home/$USER/laxz-$timenow.zip
+    fi
 }
 
 if [ $# == 0 ]; then
@@ -48,7 +52,7 @@ else
 
 	-h) help_func ;; 
 	-b) brightness $2 ;; 
-    -enc) enc_fun $2 ;;
+    -z) zipper $* ;;
 	-i) internet ;; 
     -u) update ;;
 	*) echo "Option $1 not recognized" ;;
