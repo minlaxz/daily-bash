@@ -1,0 +1,10 @@
+FILE=./laxz.sh
+if [ -f "$FILE" ]; then
+    echo "alias laxz=./laxz.sh" | tee -a /home/$USER/.bashrc > /dev/null
+    source /home/$USER/.bashrc
+    chmod a+x ./*.sh
+    echo "now you can use 'laxz -h' for usage"
+fi
+
+
+#TODO shell  echo $$ echo  $0
