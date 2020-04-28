@@ -9,16 +9,17 @@ usage(){
     echo "-z, --zip, zip any given {file(s)} {folder(s)}." ;
     echo "-e, --encrypt, encrypt given {file} with aes256." ;
     echo "-d, --decrypt, decrypt laxz encrpyted {enc_file} aes256." ;
-    echo "-rm, --remove, safe remove to .trash unlike built-in `rm`." ;
+    echo "-rm, --remove, safe remove to .trash unlike built-in 'rm'." ;
     echo "-----------Root-----------------";
     echo "-u, --update , pkg update and upgrade." ;
     echo "-m, --mount, mount a network's samba drive."
 }
 
 internet(){
+    clear
     echo -e "Checking internet connection ..." ;
     wget -q --spider http://example.com ;
-    if [ $? -eq 0 ] ; 
+    if [ $? -eq 0 ] ;
     then echo "Internet connection is -Noice-." ;
     else echo -e "No Internet Connection!" ;
     exit 0 ; fi
@@ -26,13 +27,13 @@ internet(){
 
 
 brightness(){
-    if [[ $1 == "" || $1 < 0.5 || $1 > 1.3 ]]; 
-    then echo "brightness $1 {value error}."; 
+    if [[ $1 == "" || $1 < 0.5 || $1 > 1.3 ]];
+    then echo "brightness $1 {value error}.";
     else
-    port=$(xrandr -q | grep ' connected' | head -n 1 | cut -d ' ' -f1);
-    echo "Port is detected : $port";
-    xrandr --output $port --brightness $1;
-    echo "set.";
+        port=$(xrandr -q | grep ' connected' | head -n 1 | cut -d ' ' -f1);
+        echo "Port is detected : $port";
+        xrandr --output $port --brightness $1;
+        echo "set.";
     fi;
 }
 
@@ -40,10 +41,10 @@ update(){
     if [ $(id -u) != "0" ] ;
     then echo "Please run 'update option' as root" ;
     else sudo apt update ;
-    read -p 'do you want to upgrade: y/n ' uservar ;
+        read -p 'do you want to upgrade: y/n ' uservar ;
         if [ $uservar -eq 'y' ];
         then sudo apt upgrade ;
-        else echo "user aborded." ; fi;
+    else echo "user aborded." ; fi;
     fi;
 }
 
@@ -76,10 +77,10 @@ mounter(){
     then echo "Please run 'update option' as root" ;
     else
         if [ $1 != "" ] ; then
-        mountpoint=$1
-        sudo mount.cifs //192.168.0.10/samba_share $mountpoint -o user=laxzs,rw,pass=laxzsmb
+            mountpoint=$1
+            sudo mount.cifs //192.168.0.10/samba_share $mountpoint -o user=laxzs,rw,pass=laxzsmb
         else
-        echo "Specify the mount point."
+            echo "Specify the mount point."
         fi;
     fi;
 }
@@ -97,18 +98,19 @@ if [ $# -eq 0 ]; then
     echo "[-v, --version] check version." ;
 else
     case "$1" in
-
-	-h | --help) usage ;; 
-    -v | --version) version ;;
-    -e | --encrypt) encryptor $2 ;;
-    -d | --decrypt) decryptor $s ;;
-	-b | --brightness) brightness $2 ;; 
-	-i | --internet) internet ;; 
-    -u | --update) update ;;
-    -z | --zip) zipper $* ;;
-    -m | --mount) mounter $2 $3;;
-    -rm | --remove) remover $* ;;
-	*) echo "Option $1 not recognized" ;;
-
-	esac
+        
+        -h | --help) usage ;;
+        -v | --version) version ;;
+        -e | --encrypt) encryptor $2 ;;
+        -d | --decrypt) decryptor $s ;;
+        -b | --brightness) brightness $2 ;;
+        -i | --internet) internet ;;
+        -u | --update) update ;;
+        -z | --zip) zipper $* ;;
+        -m | --mount) mounter $2 $3;;
+        -rm | --remove) remover $* ;;
+        -vm | --virtual) virtual_machine_handling ;;
+        *) echo "Option $1 not recognized" ;;
+        
+    esac
 fi
