@@ -2,50 +2,45 @@
 version='1.0.0' ;
 developer='minlaxz' ;
 usage(){
+    echo "-h, --help, print this help message and exit." ;
+    echo "-v, --version, print version."
     echo "------------NonRoot------------";
-    echo "-h , --help , print this help message and exit." ;
-    echo "-b, --brightness, change screen brightness (0.5 to 1.3)." ;
-    echo "-i , --internet , check internet connection." ;
+
+    echo "-k, --kit, handle the hardware parts"; # (0.5 to 1.3)." ;
+    echo "-n, --network, handle the networks." ;
+
     echo "-z, --zip, zip any given {file(s)} {folder(s)}." ;
     echo "-e, --encrypt, encrypt given {file} with aes256." ;
     echo "-d, --decrypt, decrypt laxz encrpyted {enc_file} aes256." ;
+
     echo "-rm, --remove, safe remove to .trash unlike built-in 'rm'." ;
-    echo "-vm, --virtual, virtual machine options"
+    echo "-v, --virtual, virtual machine options.";
+
     echo "-----------Root-----------------";
-    echo "-u, --update , pkg update and upgrade." ;
-    echo "-m, --mount, mount a network's samba drive."
-}
-
-internet(){
-    clear
-    echo -e "Checking internet connection ..." ;
-    wget -q --spider http://example.com ;
-    if [ $? -eq 0 ] ;
-    then echo "Internet connection is -Noice-." ;
-    else echo -e "No Internet Connection!" ;
-    exit 0 ; fi
-}
-
-
-brightness(){
-    if [[ $1 == "" || $1 < 0.5 || $1 > 1.3 ]];
-    then echo "brightness $1 {value error}.";
-    else
-        port=$(xrandr -q | grep ' connected' | head -n 1 | cut -d ' ' -f1);
-        echo "Port is detected : $port";
-        xrandr --output $port --brightness $1;
-        echo "set.";
-    fi;
+    echo "-u, --update, pkg update and upgrade." ;
+    echo "-m, --mount, mount a network's samba drive.";
+    echo "-l, --list, list installed packages.";
 }
 
 update(){
     if [ $(id -u) != "0" ] ;
     then echo "Please run 'update option' as root" ;
     else sudo apt update ;
-        read -p 'do you want to upgrade: y/n ' uservar ;
-        if [ $uservar -eq 'y' ];
-        then sudo apt upgrade ;
-    else echo "user aborded." ; fi;
+        read -p "Do you want to upgrade? : y/n " uservar ;
+        case $uservar in
+            [Yy]*) sudo apt upgrade ;; #break
+            #laxz.sh: line 48: break: only meaningful in a `for', `while', or `until' loop
+            #[Nn]*) exit;;
+            *) echo "Upgrade aborded." ;;
+        esac
+        #     while true; do
+        #     read -p "Do you wish to install this program?" yn
+        #     case $yn in
+        #         [Yy]* ) make install; break;;
+        #         [Nn]* ) exit;;
+        #         * ) echo "Please answer yes or no.";;
+        #     esac
+        # done
     fi;
 }
 
@@ -63,7 +58,7 @@ zipper(){
     timenow=$(date +"%Y-%m-%d-%T") ;
     echo "---zip---" ;
     zip -r /home/$USER/laxz-$timenow.zip "$@" ;
-    read -p 'do you want to encrypt: y/n ' uservar ;
+    read -p "do you want to encrypt: y/n " uservar ;
     if [ $uservar == 'y' ];
     then encryptor /home/$USER/laxz-$timenow.zip ; fi
 }
@@ -86,63 +81,10 @@ mounter(){
     fi;
 }
 
-vm_controller(){
-    echo "$1"
-    echo "$2"
-    # if [ $1 -eq "start"] ; then
-    #     echo "starting VM.";
-    # elif [ $1 -eq "stop" ] ; then
-    #     echo "stopping VM.";
-    # else
-    #     echo "Program error."
-    # fi;
+list_installed(){
+    sudo dpkg-query -Wf '${Installed-size}\t${Package}\n' | column -t
 }
 
-virtual_machine_handling(){
-    echo "--- Existing VM ---"
-    /usr/bin/vboxmanage list vms
-    echo ""
-    if [ -z "$(/usr/bin/vboxmanage list runningvms)" ] ;
-    then echo "No Running VM. "
-    else
-        echo "--- Running VM ---"
-        /usr/bin/vboxmanage list runningvms
-    fi ;
-    echo ""
-    
-    vm1="{b8197fcd-8c67-4d19-b420-dd17f98d7f52}"
-    #TODO for vm(s)
-    
-    PS3="Choose option for $vm1 : "
-    options=("start" "stop" "Adios")
-    
-    select opt in "${options[@]}"
-    do
-        case $opt in
-            "start")
-                #echo "you chose choice $REPLY which is $opt"
-                if [ -z "$(/usr/bin/vboxmanage list runningvms)" ];
-                then vm_controller $vm1 $opt;
-                else echo "[control] VM is already Running." ;
-                fi;
-            ;;
-            "stop")
-                #echo "you chose choice $REPLY which is $opt"
-                if [ -z "$(/usr/bin/vboxmanage list runningvms)" ];
-                then echo "[control] No VM is running.";
-                else vm_controller $vm1 $opt;
-                fi;
-            ;;
-            "Adios" | "q")
-            clear
-                echo "you chose choice $REPLY which is $opt !" '("Exit")'
-                break
-            ;;
-            *) echo "invalid option $REPLY";;
-        esac
-    done
-    #/usr/lib/virtualbox/VBoxHeadless --startvm {b8197fcd-8c67-4d19-b420-dd17f98d7f52}
-}
 
 version(){
     echo "Version : $version" ;
@@ -159,16 +101,22 @@ else
     case "$1" in
         
         -h | --help) usage ;;
-        -v | --version) version ;;
+        -V | --version) version ;;
+
         -e | --encrypt) encryptor $2 ;;
         -d | --decrypt) decryptor $s ;;
-        -b | --brightness) brightness $2 ;;
-        -i | --internet) internet ;;
-        -u | --update) update ;;
         -z | --zip) zipper $* ;;
-        -m | --mount) mounter $2 $3;;
+
+        -k | --kit) bash sys-dev.sh $2 ;;
+        -n | --network) bash network-handling.sh ;;
+        -p | --pkg) bash package-handling.sh ;;
+        -v | --virtual) bash vm-handling.sh ;;
+
+        
+        -m | --mount) mounter $2 ;;
         -rm | --remove) remover $* ;;
-        -vm | --virtual) virtual_machine_handling ;;
+        
+        -l | --list) list_installed ;;
         *) echo "Option $1 not recognized" ;;
         
     esac
