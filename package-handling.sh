@@ -1,11 +1,13 @@
 modify(){
-    echo "Modifier"
+    # PS3="Options for ,modifier : "
+    # options=("")
+    echo "I am modifier."
 }
 
 installed_func(){
     read -p "enter package_partial_name : " pkgname;
-    if [ -n "$(apt list --installed | grep $pkgname)" ];
-    then echo "That package is not installed";
+    if [ -z "$(apt list --installed | grep $pkgname)" ];
+    then echo "That package is not installed $pkgname";
     else
         echo "package info"
         apt list --installed | grep $pkgname;
@@ -15,6 +17,21 @@ installed_func(){
             *) echo "Aborded.";;
         esac
     fi
+}
+
+update_func(){
+    sudo apt update
+    if [ `id -u` != "0" ] ;
+    then echo "Please run this options as root."
+    else
+        sudo apt update
+        read -p "Do you want to upgrade y/n : " uservar;
+        case $uservar in
+            [Yy]*) sudo apt upgrade ;;
+            *) echo "Aborded." ;;
+        esac
+    fi
+    
 }
 
 init(){
@@ -27,7 +44,7 @@ init(){
             "installed")
             installed_func ; break;;
             "update")
-            echo "#TODO" ;;
+            update_func ;;
             "fix-broken")
             echo "#TODO";;
             "Adios" | "q")

@@ -1,6 +1,8 @@
 #!/bin/bash
 version='1.0.0' ;
-developer='minlaxz' ;
+developer='minlaxz :>' ;
+thispath=/home/$USER/git-in-sync/daily-bash/
+
 usage(){
     echo "-h, --help, print this help message and exit." ;
     echo "-v, --version, print version."
@@ -17,7 +19,7 @@ usage(){
     echo "-v, --virtual, virtual machine options.";
 
     echo "-----------Root-----------------";
-    echo "-u, --update, pkg update and upgrade." ;
+    echo "-p, --pkg, pkg update and upgrade." ;
     echo "-m, --mount, mount a network's samba drive.";
     echo "-l, --list, list installed packages.";
 }
@@ -91,6 +93,7 @@ version(){
 }
 
 developer(){
+    notify-send 'Developed by' 'minlaxz'
     echo "Developed by : $developer" ;
 }
 
@@ -102,15 +105,16 @@ else
         
         -h | --help) usage ;;
         -V | --version) version ;;
+        --developer) developer ;;
 
         -e | --encrypt) encryptor $2 ;;
         -d | --decrypt) decryptor $s ;;
         -z | --zip) zipper $* ;;
 
-        -k | --kit) bash sys-dev.sh $2 ;;
-        -n | --network) bash network-handling.sh ;;
-        -p | --pkg) bash package-handling.sh ;;
-        -v | --virtual) bash vm-handling.sh ;;
+        -k | --kit) bash $thispath/sys-dev.sh $2 ;;
+        -n | --network) bash $thispath/network-handling.sh ;;
+        -p | --pkg) bash $thispath/package-handling.sh ;;
+        -v | --virtual) bash $thispath/vm-handling.sh ;;
 
         
         -m | --mount) mounter $2 ;;
