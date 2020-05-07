@@ -4,6 +4,10 @@ modify(){
     echo "I am modifier."
 }
 
+list_installed(){
+    sudo dpkg-query -Wf '${Installed-size}\t${Package}\n' | column -t
+}
+
 installed_func(){
     read -p "enter package_partial_name : " pkgname;
     if [ -z "$(apt list --installed | grep $pkgname)" ];
