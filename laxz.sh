@@ -109,11 +109,6 @@ zipper(){
     fi
 }
 
-remover(){
-    mv "$@" /home/$USER/.trash ;
-    echo "removed to Trash." ;
-}
-
 mounter(){
     if [ $(id -u) != "0" ] ;
     then echo "Please run 'update option' as root" ;
@@ -185,7 +180,7 @@ else
             fi
         else
         echo "iFunc bypassed."
-        bash $user_files/sys-dev.sh
+        bash $user_files/hardware-handling.sh
         fi 
         ;;
         -n | --network) bash $user_files/network-handling.sh ;;
@@ -194,7 +189,14 @@ else
 
         
         -m | --mount) mounter $2 ;;
-        -r | --remove) remover $* ;;
+        -r | --remove) 
+        if [[ `apt list --installed trash-cli 2>/dev/null | wc -l` == 1 ]] ; then
+        sudo apt install trash-cli #Thanks https://github.com/andreafrancia/trash-cli
+        else
+        trash-put "$@"
+        fi
+        echo "removed to Trash."
+        ;;
         *) echo "Option $1 not recognized" ;;
         
     esac
