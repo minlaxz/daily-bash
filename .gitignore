@@ -2,4 +2,6 @@
 .credentials/
 __pycache__/
 .trash/*
+.trash/*.sh
 file1
+symme.key
