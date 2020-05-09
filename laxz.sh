@@ -1,21 +1,34 @@
 #!/bin/bash
+#last_used 1588951891 > 1588951891
+#sed -i '3s|last_used|abcdef|1' laxz.config
+#awk -F" " '{ print $2}' laxz.config
+#echo "last used " `awk 'NR==3' laxz.config | cut -f 2 -d ' '`
+user_files=/home/$USER/git-in-sync/workspace-bash/daily-bash
+config_file=$user_files/laxz_config
+source $config_file
+
+now=`date "+%Y-%m-%d-%T"`
+echo "last used $last_used"
+sed -i "s/last_used=[^ ]*/last_used=$now/" $config_file
+
 version='1.0.0' ;
 developer='minlaxz :>' ;
-thispath=/home/$USER/git-in-sync/workspace-bash/daily-bash/
-AESKEY=/home/$USER/symme.key
-usage(){
-    echo "-h, --help, print this help message and exit." ;
-    echo "-v, --version, print version."
+AESKEY=$user_files/symme.key
 
-    echo "-k, --kit, handle the hardware parts";
-    echo "-n, --network, handle the networks." ;
-    echo "-v, --virtual, virtual machine options.";
-    echo "-z, --zip, zip any given file(s) or folder(s)." ;
-    echo "-e, --encrypt, encrypt given {file} with aes256." ;
-    echo "-d, --decrypt, decrypt laxz encrpyted {enc_file} aes256." ;
-    echo "-r, --remove, safe remove to .trash unlike built-in 'rm'." ;
-    echo "-p, --pkg, pkg update and upgrade." ;
-    echo "-m, --mount, mount a network's samba drive.";
+usage(){
+    echo "      --help      print laxz help message and exit." ;
+    echo "      --version   print laxz version."
+    echo "      --reset     no laxz hagas esto."
+
+    echo "-h    --hardware  handle the hardware parts";
+    echo "-n    --network   handle the networks." ;
+    echo "-v    --virtual   virtual machine options.";
+    echo "-z    --zip       zip any given file(s) or folder(s)." ;
+    echo "-e    --encrypt   encrypt given {file} with aes256." ;
+    echo "-d    --decrypt   decrypt laxz encrpyted {enc_file} aes256." ;
+    echo "-r    --remove    safe remove to .trash unlike built-in 'rm'." ;
+    echo "-p    --pkg       package update and upgrade." ;
+    echo "-m    --mount     mount a network's samba drive.";
 }
 integrity(){
     echo "Original : $2 , CHECKSUM : $1 "
@@ -114,6 +127,29 @@ mounter(){
     fi;
 }
 
+iFunc(){
+flag=$1
+value=$2
+    case "$flag" in
+    "--monitor" | "-m" )
+    #error -1, >= 10
+        if [[ $value == "" || $value < 0.5 || $value > 1.3 ]] ; then #|| $value =~ ^[-+]?[0-9]+$
+        echo "brightness $value {value error}."
+        else
+        echo "previous brightness : $brightness"
+        echo "current brightess : $value"
+        port=$(xrandr -q | grep ' connected' | head -n 1 | cut -d ' ' -f1);
+        echo "port detected : $port";
+        xrandr --output $port --brightness $value;
+        sed -i "s/brightness=[^ ]*/brightness=$value/" $config_file
+        echo "all set."
+        fi
+        ;;
+    *)
+        echo "error"
+        ;;
+    esac
+}
 version(){
     echo "Version : $version" ;
 }
@@ -125,23 +161,36 @@ developer(){
 }
 
 if [ $# -eq 0 ]; then
-    echo "[-h, --help] for usage." ;
-    echo "[-v, --version] check version." ;
+    echo "[--help] for usage." ;
+    echo "[--version] check version." ;
 else
     case "$1" in
         
-        -h | --help) usage ;;
-        -V | --version) version ;;
+        --help) usage ;;
+        --version) version ;;
         --developer) developer ;;
+        --reset) reset ;;
 
         -e | --encrypt) encryptor $2 ;;
         -d | --decrypt) decryptor $2 ;;
         -z | --zip) zipper $* ;;
 
-        -k | --kit) bash $thispath/sys-dev.sh $2 ;;
-        -n | --network) bash $thispath/network-handling.sh ;;
-        -p | --pkg) bash $thispath/package-handling.sh ;;
-        -v | --virtual) bash $thispath/vm-handling.sh ;;
+        -h | --hardware)
+        if [[ $2 == "-m" || $2 == "--monitor" ]] ; then
+            if [[ $3 == "" ]] ; then
+            read -p 'set brightness 0.5 ~ 1.3 : ' br ;
+            iFunc $2 $br
+            else
+            iFunc $2 $3
+            fi
+        else
+        echo "iFunc bypassed."
+        bash $user_files/sys-dev.sh
+        fi 
+        ;;
+        -n | --network) bash $user_files/network-handling.sh ;;
+        -p | --pkg) bash $user_files/package-handling.sh ;;
+        -v | --virtual) bash $user_files/vm-handling.sh ;;
 
         
         -m | --mount) mounter $2 ;;
