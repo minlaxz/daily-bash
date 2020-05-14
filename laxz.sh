@@ -11,8 +11,6 @@ now=`date "+%Y-%m-%d-%T"`
 echo "last used $last_used"
 sed -i "s/last_used=[^ ]*/last_used=$now/" $config_file
 
-version='1.0.0' ;
-developer='minlaxz :>' ;
 AESKEY=$user_files/symme.key
 
 usage(){
@@ -156,23 +154,13 @@ value=$2
         ;;
     esac
 }
-version(){
-    echo "Version : $version" ;
-}
 
-developer(){
-    notify-send 'Developed by' 'minlaxz'
-    echo -e "\a"
-    echo "Developed by : $developer" ;
-}
 sync(){
     clear
     xrandr --output VGA-1 --brightness $brightness;
     echo "all settings in sync."
 }
-status(){
-    echo "Brightess is $brightness"
-}
+
 if [ $# -eq 0 ]; then
     echo "[--help] for usage." ;
     echo "[--version] check version." ;
@@ -180,28 +168,48 @@ else
     case "$1" in
         
         --help) usage ;;
-        --version) version ;;
-        --developer) developer ;;
-        --reset) reset ;;
-        --status) status ;;
-        --sync) sync ;;
+        --version) 
+        echo "$version"
+        ;;
+        --developer)
+        echo -e "\a"
+        clear
+        notify-send 'hidden option' 'Developed by minlaxz'
+        ;;
+        --reset) 
+        echo "Reset laxz."
+        ;;
+        --status) 
+        echo "Brightess is $brightness"
+        ;;
+        --sync) 
+        clear
+        xrandr --output VGA-1 --brightness $brightness;
+        echo "all settings in sync."
+        ;;
 
         -e | --encrypt) encryptor $2 ;;
         -d | --decrypt) decryptor $2 ;;
         -z | --zip) zipper $* ;;
 
         -h | --hardware)
-        if [[ $2 == "-m" || $2 == "--monitor" ]] ; then
-            if [[ $3 == "" ]] ; then
-            read -p 'set brightness 0.5 ~ 1.3 : ' br ;
+        if [[ $2 == "" ]]; then
+        bash $user_files/hardware-handling.sh
+        else
+        case "$2" in
+            -m | --monitor ) 
+            if [[ $3 == "" ]]; then
+            read -p "set brightness 0.5 ~ 1.3 : " br ;
             iFunc $2 $br
             else
             iFunc $2 $3
             fi
-        else
-        echo "iFunc bypassed."
-        bash $user_files/hardware-handling.sh
-        fi 
+            ;; ##EXTENSIBLE
+            *)
+            echo "$2 is invalid for $1."
+            ;;
+        esac
+        fi
         ;;
         -n | --network) bash $user_files/network-handling.sh ;;
         -p | --pkg) bash $user_files/package-handling.sh ;;
