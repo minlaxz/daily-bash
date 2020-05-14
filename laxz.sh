@@ -16,19 +16,26 @@ developer='minlaxz :>' ;
 AESKEY=$user_files/symme.key
 
 usage(){
-    echo "      --help      print laxz help message and exit." ;
+    echo "      --help      print laxz help message and exit." 
     echo "      --version   print laxz version."
     echo "      --reset     no laxz hagas esto."
+    echo "      --status    laxz status."
+    echo "      --sync      sync with all setting."
+    echo ""
+    echo "-fz   --file      check file type."
+    echo "-cp   --copy      copy files and directories."
+    echo "-rm   --remove    safe remove files and directories."
+    echo ""
+    echo "-h    --hardware  handle the hardware parts."
+    echo "-n    --network   handle the networks." 
+    echo "-v    --virtual   virtual machine options."
 
-    echo "-h    --hardware  handle the hardware parts";
-    echo "-n    --network   handle the networks." ;
-    echo "-v    --virtual   virtual machine options.";
-    echo "-z    --zip       zip any given file(s) or folder(s)." ;
-    echo "-e    --encrypt   encrypt given {file} with aes256." ;
-    echo "-d    --decrypt   decrypt laxz encrpyted {enc_file} aes256." ;
-    echo "-r    --remove    safe remove to .trash unlike built-in 'rm'." ;
-    echo "-p    --pkg       package update and upgrade." ;
-    echo "-m    --mount     mount a network's samba drive.";
+    echo "-z    --zip       zip any given file(s) or folder(s)." 
+    echo "-e    --encrypt   encrypt given {file} with aes256." 
+    echo "-d    --decrypt   decrypt laxz encrpyted {enc_file} aes256." 
+
+    echo "-p    --pkg       package update and upgrade." 
+    echo "-m    --mount     mount a network's samba drive."
 }
 integrity(){
     echo "Original : $2 , CHECKSUM : $1 "
@@ -131,13 +138,17 @@ value=$2
         if [[ $value == "" || $value < 0.5 || $value > 1.3 ]] ; then #|| $value =~ ^[-+]?[0-9]+$
         echo "brightness $value {value error}."
         else
-        echo "previous brightness : $brightness"
-        echo "current brightess : $value"
-        port=$(xrandr -q | grep ' connected' | head -n 1 | cut -d ' ' -f1);
-        echo "port detected : $port";
-        xrandr --output $port --brightness $value;
-        sed -i "s/brightness=[^ ]*/brightness=$value/" $config_file
-        echo "all set."
+            if [[ $brightness == $value ]]; then
+            echo "Brightness is already set to <$value>."
+            else
+            echo "previous brightness : $brightness"
+            echo "current brightess : $value"
+            port=$(xrandr -q | grep ' connected' | head -n 1 | cut -d ' ' -f1);
+            echo "port detected : $port";
+            xrandr --output $port --brightness $value;
+            sed -i "s/brightness=[^ ]*/brightness=$value/" $config_file
+            echo "all set."
+            fi;
         fi
         ;;
     *)
@@ -154,7 +165,14 @@ developer(){
     echo -e "\a"
     echo "Developed by : $developer" ;
 }
-
+sync(){
+    clear
+    xrandr --output VGA-1 --brightness $brightness;
+    echo "all settings in sync."
+}
+status(){
+    echo "Brightess is $brightness"
+}
 if [ $# -eq 0 ]; then
     echo "[--help] for usage." ;
     echo "[--version] check version." ;
@@ -165,6 +183,8 @@ else
         --version) version ;;
         --developer) developer ;;
         --reset) reset ;;
+        --status) status ;;
+        --sync) sync ;;
 
         -e | --encrypt) encryptor $2 ;;
         -d | --decrypt) decryptor $2 ;;
@@ -189,15 +209,25 @@ else
 
         
         -m | --mount) mounter $2 ;;
-        -r | --remove) 
+        -rm | --remove) 
+        echo "remove function with pain in ass safe." 
         if [[ `apt list --installed trash-cli 2>/dev/null | wc -l` == 1 ]] ; then
         sudo apt install trash-cli #Thanks https://github.com/andreafrancia/trash-cli
         else
-        trash-put "$@"
+        #echo $2
+        #trash-put "@$"
+        trash-put "$2"
         fi
         echo "removed to Trash."
         ;;
-        *) echo "Option $1 not recognized" ;;
+        -cp | --copy)
+        echo "copy function with progress verbose."
+        if [[ $3 == "" ]]; then
+        echo "insuffcient argument."
+        else
+        rsync -ah --progress $2 $3
+        fi;;
+        *) echo "$1 isn't laxz's command." ;;
         
     esac
 fi
