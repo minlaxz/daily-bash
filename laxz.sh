@@ -47,10 +47,10 @@ iFunc() {
     --monitor)
         #error -1, >= 10
         if [[ $value == "" || $value < 0.5 || $value > 1.3 ]]; then #|| $value =~ ^[-+]?[0-9]+$
-            printf "brightness $value {value error}."
+            printf "brightness $value {value error}.\n"
         else
             if [[ $brightness == $value ]]; then
-                printf "Brightness is already set to <$value>."
+                printf "Brightness is already set to <$value>.\n"
             else
                 printf "previous brightness : $brightness"
                 printf "current brightess : $value"
@@ -58,7 +58,7 @@ iFunc() {
                 printf "port detected : $port"
                 xrandr --output $port --brightness $value
                 sed -i "s/brightness=[^ ]*/brightness=$value/" $config_file
-                printf "all set."
+                printf "all set.\n"
             fi
         fi
         ;;
@@ -146,7 +146,9 @@ iFunc() {
         fi
         ;;
     *)
-        printf "[iFunc] internal error"
+        printf "[iFunc] internal error\n"
+        printf "flag : $flag\n"
+        printf "value : $value\n"
         ;;
     esac
 }
@@ -157,32 +159,38 @@ sync() {
     printf "all set."
 }
 
+errOut(){
+    errFlag=$1
+    printf "Not an option.\n"
+    printf "laxz $errFlag --help\n"
+}
+
 if [ $# -eq 0 ]; then
     printf "[--help] for usage.\n"
     printf "[--version] check version.\n"
 else
-    main_var=$1 #variable handling**
-    case "$main_var" in
-    -hw | --hardware) main_var="--hardware" ;;
-    -ec | --encrypt) main_var="--encrypt" ;;
-    -dc | --decrypt) main_var="--decrypt" ;;
-    -nw | --network) main_var="--network" ;;
-    -zz | --zip) main_var="--zip" ;;
-    -pk | --package) main_var="--package" ;;
-    -vm | --virtual) main_var="--virtual" ;;
-    -mn | --mount) main_var="--mount" ;;
-    -rm | --remove) main_var="--remove" ;;
-    -cp | --copy) main_var="--copy" ;;
-    -ex | --expose) main_var="--expose" ;;
-    --help) main_var="--help" ;;
-    --version) main_var="--version" ;;
-    --reset) main_var="--reset" ;;
-    --status) main_var="--status" ;;
-    --sync) main_var="--sync" ;;
+    stVar=$1 #variable handling**
+    case "$stVar" in
+    -hw | --hardware) stVar="--hardware" ;;
+    -ec | --encrypt) stVar="--encrypt" ;;
+    -dc | --decrypt) stVar="--decrypt" ;;
+    -nw | --network) stVar="--network" ;;
+    -zz | --zip) stVar="--zip" ;;
+    -pk | --package) stVar="--package" ;;
+    -vm | --virtual) stVar="--virtual" ;;
+    -mn | --mount) stVar="--mount" ;;
+    -rm | --remove) stVar="--remove" ;;
+    -cp | --copy) stVar="--copy" ;;
+    -ex | --expose) stVar="--expose" ;;
+    --help) stVar="--help" ;;
+    --version) stVar="--version" ;;
+    --reset) stVar="--reset" ;;
+    --status) stVar="--status" ;;
+    --sync) stVar="--sync" ;;
     *) printf "[--help] for usage.\n" ;;
     esac
-
-    case "$main_var" in
+    ndVar=$2
+    case "$stVar" in
     --help) bash $prefix/global-help.sh ;;
     --version) printf "$version\n" ;;
     --developer)
@@ -200,41 +208,41 @@ else
         #printf "third arg is : ${@:3}"
         ;;
     --expose)
-        if [[ $2 == --[hH]* ]]; then #if [[ $2 == -[hH]* || $2 == --[hH]* ]]; then
-            bash $prefix/global-help.sh $main_var
-        elif [[ $2 == "" ]]; then
-            printf "[expose-e1] -> invalid. see laxz --expose --help\n"
+        if [[ $ndVar == --[hH]* ]]; then
+            bash $prefix/global-help.sh $stVar
+        elif [[ $ndVar == "" ]]; then
+            errOut $stVar $ndVar
         else
-            case "$2" in
+            case "$ndVar" in
             -[sS]*)
-                sub_var="--service"
-                iFunc $main_var $sub_var
+                iFunc $stVar "--service"
                 ;;
             -[fF]*)
-                sub_var="--filesystem"
-                iFunc $main_var $sub_var
+                iFunc $stVar "--filesystem"
                 ;;
-            *) printf "[expose-e2] -> invalid. see laxz --expose --help\n" ;;
+            *) 
+            errOut $stVar $ndVar
+            ;;
             esac
         fi
         ;;
     --encrypt)
         if [[ $2 == --[hH]* ]]; then
-            bash $prefix/global-help.sh $main_var
+            bash $prefix/global-help.sh $stVar
         else
-            iFunc $main_var $2
+            iFunc $stVar $2
         fi
         ;;
     --decrypt)
         if [[ $2 == --[hH]* ]]; then
-            bash $prefix/global-help.sh $main_var
+            bash $prefix/global-help.sh $stVar
         else
-            iFunc $main_var $2
+            iFunc $stVar $2
         fi
         ;;
     --zip) zipper $* ;;
 
-    --hardware)
+    --hardware) #$1
         if [[ $2 == "" ]]; then
             bash $prefix/hardware-handling.sh
         else
@@ -242,9 +250,9 @@ else
             -m | --monitor)
                 if [[ $3 == "" ]]; then
                     read -p "set brightness 0.5 ~ 1.3 : " br
-                    iFunc $2 $br
+                    iFunc "--monitor" $br
                 else
-                    iFunc $2 $3
+                    iFunc "--monitor" $3
                 fi
                 ;; ##EXTENSIBLE
             *)
