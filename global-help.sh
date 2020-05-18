@@ -35,14 +35,23 @@ case "$flag" in
     printf "\n"
     printf "[help]: laxz's Encryptor.\n"
     printf "\n"
-    printf "example[0] laxz -ec {--ecrypt} filepath or directory\n"
+    printf "example[0]: laxz -ec {--ecrypt} filepath or directory\n"
     printf "\n"
 ;;
 --decrypt)
     printf "\n"
     printf "[help]: laxz's Decryptor.\n"
     printf "\n"
-    printf "example[0] laxz -dc {--decrypt} file.loc or file.los\n"
+    printf "example[0]: laxz -dc {--decrypt} file.loc or file.los\n"
+    printf "\n"
+;;
+--network)
+    printf "\n"
+    printf "[help]: laxz's Network.\n"
+    printf "\n"
+    printf "example[0]: $ laxz -nw -i , check internet connection.\n"
+    printf "example[1]: $ laxz -nw -if <interface card> , check network information.\n "
+    printf "\t    $ ... <card> en, do, wl\n"
     printf "\n"
 ;;
 *)

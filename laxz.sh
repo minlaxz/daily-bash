@@ -2,13 +2,24 @@
 
 prefix=/home/$USER/git-in-sync/workspace-bash/daily-bash
 config_file=$prefix/laxz_config
-source $config_file
+AESKEY=$prefix/symme.key
 
 now=$(date "+%Y-%m-%d-%T")
+version='1.0.2'
+developer='minlaxz'
+
+if [[ ! -f $config_file ]]; then
+    touch $config_file
+    echo "last_used=$now" >>$config_file
+    echo "developer=$developer" >>$config_file
+    echo "version=$version" >>$config_file
+    echo "brightness=1" >>$config_file
+    printf "CONFIG File created.\n"
+fi
+source $config_file
+
 printf "last used $last_used.\n"
 sed -i "s/last_used=[^ ]*/last_used=$now/" $config_file
-
-AESKEY=$prefix/symme.key
 
 integrity() {
     printf "Original : $2 , CHECKSUM : $1 \n"
@@ -90,7 +101,7 @@ iFunc() {
         if [[ ! -f $org_file ]]; then
             printf "404.\n"
             printf "laxz --encrypt --help for usage.\n"
-        
+
         else
             printf "enCRYption---\n"
             printf "encrypting file : '$org_file' with aes-256."
@@ -126,12 +137,12 @@ iFunc() {
             printf "404.\n"
             printf "laxz --decrypt --help for usage.\n"
         elif [[ ${locked_file: -4} == ".loc" ]]; then
-        printf "deCRYption---\n"
+            printf "deCRYption---\n"
             printf "encrypted with PASSWORD\n"
             openssl aes-256-cbc -d -salt -pbkdf2 -in $locked_file -out ${locked_file/.loc/}
             integrity $(sha256sum $locked_file) $(sha256sum ${locked_file/.loc/})
         elif [[ ${locked_file: -4} == ".los" ]]; then
-        printf "deCRYption---\n"
+            printf "deCRYption---\n"
             printf "encrypted with KEY_FILE\n"
             if [ ! -f $AESKEY ]; then
                 printf "THIS IS FETAL, NO AES_KEY FOUND TO UNLOCK!\n"
@@ -159,8 +170,21 @@ sync() {
     printf "all set."
 }
 
-errOut(){
+internet() {
+    echo -e "Checking internet connection ..."
+    wget -q -T 2 --spider http://example.com
+    if [ $? -eq 0 ]; then
+        printf "Internet connection is -Noice-.\n"
+    else
+        printf -e "No Internet Connection.\n"
+    fi
+}
+
+errOut() {
     errFlag=$1
+    errOpt=$2
+    errReason=$3
+
     printf "Not an option.\n"
     printf "laxz $errFlag --help\n"
 }
@@ -170,6 +194,8 @@ if [ $# -eq 0 ]; then
     printf "[--version] check version.\n"
 else
     stVar=$1 #variable handling**
+    ndVar=$2
+
     case "$stVar" in
     -hw | --hardware) stVar="--hardware" ;;
     -ec | --encrypt) stVar="--encrypt" ;;
@@ -189,7 +215,7 @@ else
     --sync) stVar="--sync" ;;
     *) printf "[--help] for usage.\n" ;;
     esac
-    ndVar=$2
+
     case "$stVar" in
     --help) bash $prefix/global-help.sh ;;
     --version) printf "$version\n" ;;
@@ -220,9 +246,9 @@ else
             -[fF]*)
                 iFunc $stVar "--filesystem"
                 ;;
-            *) 
-            errOut $stVar $ndVar
-            ;;
+            *)
+                errOut $stVar $ndVar
+                ;;
             esac
         fi
         ;;
@@ -254,7 +280,7 @@ else
                 else
                     iFunc "--monitor" $3
                 fi
-                ;; ##EXTENSIBLE
+                ;;
             *)
                 printf "$2 is invalid for $1."
                 ;;
@@ -262,20 +288,32 @@ else
         fi
         ;;
     --network)
-        if [[ $2 == "" ]]; then
-            bash $prefix/network-handling.sh
+        if [[ $ndVar == --[hH]* ]]; then
+            bash $prefix/global-help.sh $stVar
+        elif [[ $ndVar == "" ]]; then
+            errOut $stVar $ndVar
         else
-            case "$2" in
+            case "$ndVar" in
+            -i) internet ;;
+            -s)
+                #https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py | python -
+                if [[ $(apt list --installed speedtest-cli 2>/dev/null | wc -l) == 1 ]]; then
+                    printf "need to install lib.\n"
+                    sudo apt install speedtest-cli #Thanks https://askubuntu.com/a/269821
+                    speedtest-cli
+                else
+                    speedtest-cli
+                fi
+                ;;
             -if)
                 case "$3" in
                 en) ifconfig eno1 | grep inet ;;
                 do) ifconfig docker0 | grep inet ;;
                 lo) ifconfig lo | grep inet ;;
+                *) errOut $stVar $ndVar ;;
                 esac
                 ;;
-            *)
-                printf "invalid"
-                ;;
+            *) errOut $stVar $ndVar ;;
             esac
         fi
         ;;
@@ -283,7 +321,7 @@ else
     --virtual) bash $prefix/vm-handling.sh ;;
     --mount) mounter $2 ;;
     --remove)
-        printf "remove function with pain in ass safe."
+        printf "remove function with pain in ass safe.\n"
         if [[ $(apt list --installed trash-cli 2>/dev/null | wc -l) == 1 ]]; then
             sudo apt install trash-cli #Thanks https://github.com/andreafrancia/trash-cli
         else
@@ -291,12 +329,12 @@ else
             #trash-put "@$"
             trash-put "$2"
         fi
-        printf "removed to Trash."
+        printf "removed to Trash.\n"
         ;;
     --copy)
-        printf "copy function with progress verbose."
+        printf "copy function with progress verbose.\n"
         if [[ $3 == "" ]]; then
-            printf "insuffcient argument."
+            printf "insuffcient argument.\n"
         else
             rsync -ah --progress $2 $3
         fi
