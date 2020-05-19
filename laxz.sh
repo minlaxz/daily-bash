@@ -5,7 +5,7 @@ config_file=$prefix/laxz_config
 AESKEY=$prefix/symme.key
 
 now=$(date "+%Y-%m-%d-%T")
-version='1.0.2'
+version='1.0.3'
 developer='minlaxz'
 
 if [[ ! -f $config_file ]]; then
@@ -20,6 +20,15 @@ source $config_file
 
 printf "last used $last_used.\n"
 sed -i "s/last_used=[^ ]*/last_used=$now/" $config_file
+
+errOut() {
+    errFlag=$1
+    errOpt=$2
+    errReason=$3
+
+    printf "Not an option.\n"
+    printf "laxz $errFlag --help\n"
+}
 
 integrity() {
     printf "Original : $2 , CHECKSUM : $1 \n"
@@ -74,7 +83,7 @@ iFunc() {
         fi
         ;;
     --expose)
-        #thanks http://serveo.net/
+        
         case "$value" in
         --service)
             printf "Service eXposing."
@@ -156,8 +165,44 @@ iFunc() {
             printf "[Fetal] : NOT locked by laxz.\n----\n"
         fi
         ;;
+    --network)
+        case "$value" in
+        --internet)
+            echo -e "Checking internet connection ..."
+            wget -q -T 2 --spider http://example.com
+            if [ $? -eq 0 ]; then
+                printf "Internet connection is -Noice-.\n"
+            else
+                printf -e "No Internet Connection.\n"
+            fi
+            ;;
+        --speed)
+            #https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py | python -
+            if [[ $(apt list --installed speedtest-cli 2>/dev/null | wc -l) == 1 ]]; then
+                printf "need to install lib.\n"
+                sudo apt install speedtest-cli 
+                speedtest-cli
+            else
+                speedtest-cli
+            fi
+            ;;
+        --info)
+            if [[ $3 == "" ]]; then
+                printf "card name required.\n"
+                errOut $flag
+            else
+                case "$3" in
+                en) ifconfig eno1 | grep inet ;;
+                do) ifconfig docker0 | grep inet ;;
+                lo) ifconfig lo | grep inet ;;
+                *) errOut $stVar $ndVar ;;
+                esac
+            fi
+            ;;
+        esac
+        ;;
     *)
-        printf "[iFunc] internal error\n"
+        printf "[iFunc] internal fatal error\n"
         printf "flag : $flag\n"
         printf "value : $value\n"
         ;;
@@ -170,30 +215,11 @@ sync() {
     printf "all set."
 }
 
-internet() {
-    echo -e "Checking internet connection ..."
-    wget -q -T 2 --spider http://example.com
-    if [ $? -eq 0 ]; then
-        printf "Internet connection is -Noice-.\n"
-    else
-        printf -e "No Internet Connection.\n"
-    fi
-}
-
-errOut() {
-    errFlag=$1
-    errOpt=$2
-    errReason=$3
-
-    printf "Not an option.\n"
-    printf "laxz $errFlag --help\n"
-}
-
 if [ $# -eq 0 ]; then
     printf "[--help] for usage.\n"
     printf "[--version] check version.\n"
 else
-    stVar=$1 #variable handling**
+    stVar=$1 #**variable handling**
     ndVar=$2
 
     case "$stVar" in
@@ -202,9 +228,9 @@ else
     -dc | --decrypt) stVar="--decrypt" ;;
     -nw | --network) stVar="--network" ;;
     -zz | --zip) stVar="--zip" ;;
-    -pk | --package) stVar="--package" ;;
-    -vm | --virtual) stVar="--virtual" ;;
-    -mn | --mount) stVar="--mount" ;;
+    # -pk | --package) stVar="--package" ;;
+    # -vm | --virtual) stVar="--virtual" ;;
+    # -mn | --mount) stVar="--mount" ;;
     -rm | --remove) stVar="--remove" ;;
     -cp | --copy) stVar="--copy" ;;
     -ex | --expose) stVar="--expose" ;;
@@ -213,6 +239,7 @@ else
     --reset) stVar="--reset" ;;
     --status) stVar="--status" ;;
     --sync) stVar="--sync" ;;
+    --thanks) stVar="--thanks" ;;
     *) printf "[--help] for usage.\n" ;;
     esac
 
@@ -294,25 +321,10 @@ else
             errOut $stVar $ndVar
         else
             case "$ndVar" in
-            -i) internet ;;
-            -s)
-                #https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py | python -
-                if [[ $(apt list --installed speedtest-cli 2>/dev/null | wc -l) == 1 ]]; then
-                    printf "need to install lib.\n"
-                    sudo apt install speedtest-cli #Thanks https://askubuntu.com/a/269821
-                    speedtest-cli
-                else
-                    speedtest-cli
-                fi
-                ;;
-            -if)
-                case "$3" in
-                en) ifconfig eno1 | grep inet ;;
-                do) ifconfig docker0 | grep inet ;;
-                lo) ifconfig lo | grep inet ;;
-                *) errOut $stVar $ndVar ;;
-                esac
-                ;;
+            -i) iFunc $stVar "--internet" ;;
+            -is) iFunc $stVar "--speed" ;;
+            -if) iFunc $stVar "--info" ;;
+            -[i]*) printf "\-i \-is \-if\n" ;;
             *) errOut $stVar $ndVar ;;
             esac
         fi
@@ -323,9 +335,8 @@ else
     --remove)
         printf "remove function with pain in ass safe.\n"
         if [[ $(apt list --installed trash-cli 2>/dev/null | wc -l) == 1 ]]; then
-            sudo apt install trash-cli #Thanks https://github.com/andreafrancia/trash-cli
+            sudo apt install trash-cli 
         else
-            #printf $2
             #trash-put "@$"
             trash-put "$2"
         fi
@@ -338,6 +349,9 @@ else
         else
             rsync -ah --progress $2 $3
         fi
+        ;;
+    --thanks)
+        bash $prefix/thanks.sh
         ;;
     esac
 fi
