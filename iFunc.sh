@@ -1,3 +1,7 @@
+prefix=/home/$USER/git-in-sync/workspace-bash/daily-bash
+config_file=$prefix/laxz_config
+AESKEY=$prefix/symme.key
+source $config_file
 flag=$1
 value=$2
 rd=$3
@@ -7,17 +11,17 @@ case "$flag" in
     case "$value" in
     --monitor)
         if [[ $rd == "" || $rd < 0.5 || $rd > 1.3 ]]; then
-            printf "brightness $value {value error}.\n"
+            printf "brightness $rd {value error}.\n"
         else
-            if [[ $brightness == $value ]]; then
-                printf "Brightness is already set to <$value>.\n"
+            if [[ $brightness == $rd ]]; then
+                printf "Brightness is already set to <$rd>.\n"
             else
-                printf "previous brightness : $brightness"
-                printf "current brightess : $value"
+                printf "previous brightness : $brightness.\n"
+                printf "current brightess : $rd.\n"
                 port=$(xrandr -q | grep ' connected' | head -n 1 | cut -d ' ' -f1)
-                printf "port detected : $port"
-                xrandr --output $port --brightness $value
-                sed -i "s/brightness=[^ ]*/brightness=$value/" $config_file
+                printf "port detected : $port.\n"
+                xrandr --output $port --brightness $rd
+                sed -i "s/brightness=[^ ]*/brightness=$rd/" $config_file
                 printf "all set.\n"
             fi
         fi
@@ -125,19 +129,6 @@ case "$flag" in
             speedtest-cli
         else
             speedtest-cli
-        fi
-        ;;
-    --info)
-        if [[ $3 == "" ]]; then
-            printf "card name required.\n"
-            errOut $flag
-        else
-            case "$3" in
-            en) ifconfig eno1 | grep inet ;;
-            do) ifconfig docker0 | grep inet ;;
-            lo) ifconfig lo | grep inet ;;
-            *) errOut $stVar $ndVar ;;
-            esac
         fi
         ;;
     esac

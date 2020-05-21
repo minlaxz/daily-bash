@@ -1,19 +1,17 @@
 flag=$1
 case "$flag" in
 "")
-    printf "      --help      print laxz help message and exit.\n"
-    printf "      --version   print laxz version.\n"
-    printf "      --reset     no laxz hagas esto.\n"
-    printf "      --status    laxz status.\n"
-    printf "      --sync      sync with all setting.\n"
-    printf "      --expose    EXPOSING local service or file-system to the Internet.\n"
-    printf "\n"
+    printf "       --help      print laxz help message and exit.\n"
+    printf "       --version   print laxz version.\n"
+    printf "       --reset     no laxz hagas esto.\n"
+    printf "       --status    laxz status.\n"
+    printf "       --sync      sync with all setting.\n\n"
 
-    printf "/-fz   --file      check type of the file.\n"
-    printf "/-cp   --copy      copy files and directories with progess verbose.\n"
-    printf "/-rm   --remove    safe remove files and directories.\n"
-    printf "\n"
+    printf "/-fz    --file      check type of the file.\n"
+    printf "/-cp    --copy      copy files and directories with progess verbose.\n"
+    printf "/-rm    --remove    safe remove files and directories.\n\n"
 
+    printf "/-ex    --expose    EXPOSING local service or file-system to the Internet.\n"
     printf "/-hw    --hardware  handle the hardware parts.\n"
     printf "/-nw    --network   handle the networks.\n"
     printf "/-vm    --virtual   virtual machine options.\n"
@@ -50,14 +48,13 @@ case "$flag" in
     printf "[help]: laxz's Network.\n"
     printf "\n"
     printf "example[0]: $ laxz -nw -i , check internet connection.\n"
-    printf "example[1]: $ laxz -nw -if <interface card> , check network information.\n "
-    printf "\t    $ ... <card> en, do, wl\n"
+    printf "example[1]: $ laxz -nw -s , check network speed.\n"
     printf "\n"
 ;;
 *)
-    printf "\n"
     printf "Internal ERROR.\n"
     printf "\n"
-
-    ;;
+    printf "No help for $flag.\n"
+    printf "\n"
+;;
 esac

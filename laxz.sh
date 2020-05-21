@@ -92,6 +92,7 @@ else
     --status) stVar="--status" ;;
     --sync) stVar="--sync" ;;
     --thanks) stVar="--thanks" ;;
+    --developer) stVar="--developer" ;;
     *) printf "[--help] for usage.\n" ;;
     esac
 
@@ -101,6 +102,9 @@ else
     --developer)
         echo -e "\a"
         notify-send 'hidden option' 'Developed by minlaxz'
+        if [[ $ndVar == --[hH]* ]]; then
+            bash $prefix/global-help.sh $stVar
+        fi
         ;;
     --reset) printf "Reset laxz.\n" ;;
     --status) printf "Brightess is $brightness\n" ;;
@@ -171,10 +175,10 @@ else
         else
             case "$ndVar" in
             -i)  bash $iFunc $stVar "--internet" ;;
-            -is) bash $iFunc $stVar "--speed" ;;
-            -if) bash $iFunc $stVar "--info" ;;
-            -[i]*) printf "\-i \-is \-if\n" ;;
-            *) errOut $stVar $ndVar ;;
+            -s) bash $iFunc $stVar "--speed" ;;
+            *) 
+            printf "\-i \-s \n"
+            errOut $stVar $ndVar ;;
             esac
         fi
         ;;
@@ -185,7 +189,7 @@ else
         if [[ $(apt list --installed trash-cli 2>/dev/null | wc -l) == 1 ]]; then
             sudo apt install trash-cli
         else
-            #trash-put "@$"
+            #trash-put "$@"
             trash-put "$2"
         fi
         printf "removed to Trash.\n"
