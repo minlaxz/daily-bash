@@ -44,7 +44,7 @@ opencv_install() {
     echo "opencv version: "
     python3 -c "import cv2 as cv; print(cv.__version__)"
 }
-test_install(){
+test_install() {
     sudo apt install tree
 }
 installer() {
@@ -67,13 +67,29 @@ installer() {
     esac
 }
 main() {
-    flag=$1
-    option=$2
     echo -e "\a"
     echo "--Welcome to laxz--"
-    installer $option
+    PS3="install options: "
+    options=("test" "opencv" "Adios")
+    select opt in "${options[@]}"; do
+        case "$opt" in
+        "test")
+            installer test
+            break
+            ;;
+        "opencv")
+            echo "#TODO"
+            break
+            ;;
+        "Adios" | "q")
+            echo "you chose choice $REPLY which is $opt !" '("Exit")'
+            break
+            ;;
+        *)
+            echo "invalid option $REPLY"
+            break
+            ;;
+        esac
+    done
 }
-
-main "$@"
-
-#https://raw.githubusercontent.com/minlaxz/daily-bash/master/laxz_autoconfig.sh
+main
