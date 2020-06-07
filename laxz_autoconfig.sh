@@ -41,39 +41,46 @@ opencv_install() {
     cmake ../
     make
     sudo make install
-    echo "opencv version: " 
+    echo "opencv version: "
     python3 -c "import cv2 as cv; print(cv.__version__)"
-    #import cv2 as cv
-    #print(cv.__version__)
 }
-installer(){
-    echo "flag: --install"
+test_install(){
+    sudo apt install tree
+}
+installer() {
     option=$1
     case "$option" in
     general)
-    echo "installing general dependencies..."
-    ;;
+        echo "installing general dependencies..."
+        ;;
     opencv)
-    echo "installing opencv..."
-    ;;
+        echo "installing opencv..."
+        ;;
+    test)
+        echo "testing..."
+        test_install
+        ;;
     *)
-    echo "[handler]: abort."
-    echo "[handler]: /long_command {install} {option}"
-    echo "[handler]: visit https://minlaxz.web.app/init.html for detail."
-    ;;
+        echo "[handler]: abort."
+        echo "[handler]: visit https://minlaxz.web.app/init.html for detail."
+        ;;
+    esac
 }
-main(){
+main() {
     flag=$1
     option=$2
-    echo "--Welcome to laxz--"
     echo -e "\a"
-    if [[ $flag=='install' ]]; then
-    installer $option
-    else
-    echo "[main]: this do not support anything other than 'install' yet."
-    fi
+    echo "--Welcome to laxz--"
+    case "$flag" in
+    install)
+        installer $option
+        ;;
+    *)
+        echo "[main]: Not a valid flag: $flag"
+        ;;
+    esac
 }
 
-main "$@"
+main $1 $2
 
 #https://raw.githubusercontent.com/minlaxz/daily-bash/master/laxz_autoconfig.sh
