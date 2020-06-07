@@ -81,6 +81,6 @@ main() {
     esac
 }
 
-main $1 $2
+main "$@"
 
 #https://raw.githubusercontent.com/minlaxz/daily-bash/master/laxz_autoconfig.sh
