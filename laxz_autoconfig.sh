@@ -71,14 +71,7 @@ main() {
     option=$2
     echo -e "\a"
     echo "--Welcome to laxz--"
-    case "$flag" in
-    install)
-        installer $option
-        ;;
-    *)
-        echo "[main]: Not a valid flag: $flag"
-        ;;
-    esac
+    installer $option
 }
 
 main "$@"
