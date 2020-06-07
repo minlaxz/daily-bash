@@ -20,6 +20,8 @@ case "$flag" in
     printf "/-dc    --decrypt   decrypt laxz encrpyted {enc_file} aes256.\n"
     printf "/-pk    --package       package update and upgrade.\n"
     printf "/-mn    --mount     mount a network's samba drive.\n"
+    printf "/-tm    --timer     set a timer for babysitting the colab kernel.\n"
+    printf "/-genpw --generate  generate a password.\n"
     ;;
 --expose)
     printf "\n"
@@ -49,6 +51,20 @@ case "$flag" in
     printf "\n"
     printf "example[0]: $ laxz -nw -i , check internet connection.\n"
     printf "example[1]: $ laxz -nw -s , check network speed.\n"
+    printf "\n"
+;;
+--timer)
+    printf "\n"
+    printf "[help]: laxz's timer.\n"
+    printf "\n"
+    printf "example[0]: $ laxz -tm {int} , set a time out value.\n"
+    printf "\n"
+;;
+--generate)
+    printf "\n"
+    printf "[help]: laxz's password generateor.\n"
+    printf "\n"
+    printf "example[0]: $ laxz -genpw -{length: 2,4,8,16... 2_pow_anything}\n"
     printf "\n"
 ;;
 *)

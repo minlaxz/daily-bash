@@ -66,6 +66,13 @@ sync() {
     printf "all set."
 }
 
+generate_password(){
+    length=$1
+    printf "length: $length\n"
+    passwd=`openssl rand -base64 $length`
+    printf "password: $passwd\n"
+}
+
 if [ $# -eq 0 ]; then
     printf "[--help] for usage.\n"
     printf "[--version] check version.\n"
@@ -80,12 +87,14 @@ else
     -dc | --decrypt) stVar="--decrypt" ;;
     -nw | --network) stVar="--network" ;;
     -zz | --zip) stVar="--zip" ;;
+    -genpw | --generate) stVar="--generate" ;;
     # -pk | --package) stVar="--package" ;;
     # -vm | --virtual) stVar="--virtual" ;;
     # -mn | --mount) stVar="--mount" ;;
     -rm | --remove) stVar="--remove" ;;
     -cp | --copy) stVar="--copy" ;;
     -ex | --expose) stVar="--expose" ;;
+    -tm | --timer) stVar="--timer";;
     --help) stVar="--help" ;;
     --version) stVar="--version" ;;
     --reset) stVar="--reset" ;;
@@ -201,6 +210,28 @@ else
         else
             rsync -ah --progress $2 $3
         fi
+        ;;
+    --timer)
+        printf "setting a timer.\n"
+        if [[ $ndVar == --[hH]* ]]; then
+            bash $prefix/global-help.sh $stVar
+        elif [[ $ndVar == "" ]]; then
+            errOut $stVar $ndVar
+        else
+            python3 $prefix/timer.py --timer $ndVar
+        fi
+        ;;
+    --generate)
+        if [[ $ndVar == --[hH]* ]]; then
+            bash $prefix/global-help.sh $stVar
+        elif [[ $ndVar == "" || $ndVar==16 ]]; then
+            printf "$ndVar\n"
+            pw=$(openssl rand -base64 16)
+            printf "$pw\n"
+        else
+            generate_password $ndVar
+        fi
+        
         ;;
     --thanks)
         bash $prefix/thanks.sh
