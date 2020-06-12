@@ -5,7 +5,7 @@
 set -e
 
 
-this_prefix=/home/$USER/share/.local/.laxz
+this_prefix=/home/$USER/.local/share/laxz/tmp
 
 general_install() {
     echo "installing general dependencies."
@@ -135,7 +135,7 @@ main() {
             ;;
         "Adios" | "q")
             echo "you chose choice $REPLY which is $opt !" '("Exit")'
-            rm -f $this_prefix/laxz_init.sh
+            rm -rf $this_prefix
             break
             ;;
         *)
