@@ -1,5 +1,11 @@
 #!/bin/bash
-
+#apt-cache madison docker-ce
+#List the versions available in your repo:
+#If you would like to use Docker as a non-root user,
+#sudo usermod -aG docker your-user
+#command-not-found distro-info-data file iso-codes libexpat1 libgdbm6 libmagic-mgc libmagic1 libmpdec2 libpython3-stdlib
+  libpython3.8-minimal libpython3.8-stdlib libreadline8 libsqlite3-0 libssl1.1 lsb-release mime-support python-apt-common python3
+  python3-apt python3-commandnotfound python3-gdbm python3-minimal python3.8 python3.8-minimal readline-common xz-utils
 prefix=/home/$USER/git-in-sync/workspace-bash/daily-bash
 config_file=$prefix/laxz_config
 AESKEY=$prefix/symme.key
