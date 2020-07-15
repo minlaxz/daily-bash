@@ -4,20 +4,14 @@
 # cuDNN CUDA Nvidia -> https://docs.nvidia.com/deeplearning/sdk/cudnn-install/index.html#installlinux-tar
 set -e
 
-laxz_path=$HOME/.local/share/laxz/
+laxz_path=$HOME/.local/share/laxz
 laxz_tmp=$laxz_path/tmp
+hss_path=$laxz_path/hss
 
 do_exit_tasks() {
     if [[ -d $laxz_tmp ]]; then
         rm -rvf $laxz_tmp && echo "cleaned."
     fi
-}
-
-miniconda_install() {
-    echo "Miniconda installation."
-    wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
-    chmod a+x ./Miniconda3-latest-Linux-x86_64.sh
-    sh ./Miniconda3-latest-Linux-x86_64.sh
 }
 
 cuda_install() {
@@ -73,16 +67,24 @@ opencv_install() {
     echo "you can install opencv in conda env _python_."
     echo "conda create --name mlearn python=3 && conda activate mlearn && pip install opencv-python"
 }
-activate_for_ml() {
-    echo "cudnn, cuda will be only ava in this session"
-    source /home/$USER/.laxz_ml_profile
+
+miniconda_install() {
+    echo "Miniconda installation."
+    wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
+    chmod a+x ./Miniconda3-latest-Linux-x86_64.sh
+    sh ./Miniconda3-latest-Linux-x86_64.sh
 }
 
-workspace_fix() {
-    #detail in `laxz-dilemma`
-    gsettings set org.gnome.shell.app-switcher current-workspace-only true
-    gsettings set org.gnome.shell.extensions.dash-to-dock isolate-workspaces true
-}
+# activate_for_ml() {
+#     echo "cudnn, cuda will be only ava in this session only"
+#     source /home/$USER/.laxz_ml_profile
+# }
+
+# workspace_fix() {
+#     #detail in `laxz-dilemma`
+#     gsettings set org.gnome.shell.app-switcher current-workspace-only true
+#     gsettings set org.gnome.shell.extensions.dash-to-dock isolate-workspaces true
+# }
 
 installOne() {
     sudo apt install build-essentials net-tools \
@@ -92,12 +94,12 @@ installOne() {
 
 installTwo(){
     sudo apt install xsel imwheel gvfs-fuse kazam exfat-fuse
-    # echo "install vbox, viber, slack, telegram, gnome-tweak-tool, chrome-gnome-shell"
-    # echo "https://extensions.gnome.org/extension/779/clipboard-indicator/"
-    # echo "https://extensions.gnome.org/extension/690/easyscreencast/"
-    # echo "https://extensions.gnome.org/extension/750/openweather/"
-    # echo "https://extensions.gnome.org/extension/708/panel-osd/"
-    # echo "https://extensions.gnome.org/extension/234/steal-my-focus/"
+    echo "install vbox, viber, slack, telegram, gnome-tweak-tool, chrome-gnome-shell"
+    echo "https://extensions.gnome.org/extension/779/clipboard-indicator/"
+    echo "https://extensions.gnome.org/extension/690/easyscreencast/"
+    echo "https://extensions.gnome.org/extension/750/openweather/"
+    echo "https://extensions.gnome.org/extension/708/panel-osd/"
+    echo "https://extensions.gnome.org/extension/234/steal-my-focus/"
     echo "ZSH installation."
     sudo apt install zsh curl
     sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
@@ -108,35 +110,21 @@ installTwo(){
 
 installThree(){
     echo "This may take several minutes."
-    opencv_install
-    cuda_install
-    cudnn_install
-}
-
-main_help() {
-    echo "--help message--"
-    echo ""
-    echo "help      --show this super helpful message."
-    echo "install   --install required softwares or services."
-    echo "uninstall --uninstall..."
-    echo "adios     --exit and clean everything."
-    echo ""
-}
-
-sf_istaller_help() {
-    echo "--install options--"
-    echo ""
-    echo "laxz    --laxz's sys handler" #
-    echo "one     --general dependencies" ##
-    echo "two     --setup for general workspace" #
-    echo "three   --setup for machine learning"
-    echo "menu    --back to main menu."
-    echo "exit    --ctrl c or exit."
-    echo "so on."
+    # opencv_install
+    # cuda_install
+    # cudnn_install
 }
 
 software_installer() {
-    sf_istaller_help
+    echo ""
+    echo "--install options--"
+    echo ""
+    echo "laxz)    --laxz's sys handler" #
+    echo "one)     --general dependencies" ##
+    echo "two)     --setup for general workspace" #
+    echo "three)   --setup for machine learning"
+    echo "menu)    --back to main menu."
+    echo ""
     read -p "choose what do you want to install: " userChoice
     case "$userChoice" in 
     laxz)
@@ -164,64 +152,70 @@ service_installer() {
     echo "service installer."
 }
 
-installer() {
-    echo "Main installer."
+master_installer() {
     echo ""
-    echo "sf        --call software installer."
-    echo "sv        --call service installer."
-    echo "return    --return to main menu."
+    echo "what I can do -- "
+    echo "1)-sf      --software        call software installer."
+    echo "2)-sv      --service         call service installer."
+    echo "3)-r       --return          return to main menu and exit."
     read -p "which do you want to install: " userChoice
     case "$userChoice" in
-    sf)
-        echo "handling over software installer."
+    -sf | 1 | --software)
+        echo "handling over to software installer."
         software_installer
         ;;
-    sv)
-        echo "handling over service installer."
+    -sv | 2 | --service)
+        echo "handling over to service installer."
         service_installer
         ;;
-    return)
+    -r | 4 | --return)
         echo "return to main menu."
         main
         ;;
-
     *)
         echo "abort, <$userChoice> not an option."
+        master_installer
         ;;
     esac
 
 }
 
-uninstaller() {
+master_uninstaller() {
     echo "still ongoing. TODO"
     #rm -rvf $laxz_path
 }
 
 main() {
-    echo "--Welcome to laxz--"
-    options=("help" "install" "uninstall" "Adios")
-    PS3="choose an option:1,2,3,4: "
-    select opt in "${options[@]}"; do
-        case "$opt" in
-        "help")
-            main_help
+    echo ""
+    echo -e "\e[1;31m--Welcome to laxz--\e[0m"
+    echo ""
+    echo "1)-i  --install        install required softwares or services."
+    echo "2)-u  --uninstall      uninstall..."
+    echo "3)-e  --adios          exit and clean everything."
+    echo ""
+    read -p "choose an option: " opt
+    #options=("install" "uninstall" "Adios")
+    #PS3="choose an option:1/2/3:"
+    #select opt in "${options[@]}"; do
+    case "$opt" in
+        -i | 1 | --[iI]* )
+            master_installer
             ;;
-        "install")
-            installer
+        -u | 2 | --[uU]* )
+            master_uninstaller
             ;;
-        "uninstall")
-            uninstaller
-            ;;
-        "Adios")
-            echo "you chose choice $REPLY which is $opt !" '("Exit")'
-            do_exit_tasks
-            break
+        -e | 3 | --[Aa]* )
+            # echo "you chose $REPLY which is $opt !" 
+            echo '("Exit")'
+            #do_exit_tasks
+            #break
             ;;
         *)
+            echo " choose an option: 1 or 2 or 3 "
             echo "visit https://minlaxz.web.app/init.html for detail."
-            echo "laxz: Not an option <$REPLY>."
+            echo "Not an option <$opt>."
             ;;
         esac
-    done
+    #done
 }
 main
