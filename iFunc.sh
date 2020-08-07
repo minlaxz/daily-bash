@@ -1,4 +1,4 @@
-prefix=/home/$USER/git-in-sync/workspace-bash/daily-bash
+prefix=$HOME/labs/code-space/workspace-bash/daily-bash
 config_file=$prefix/laxz_config
 AESKEY=$prefix/symme.key
 source $config_file

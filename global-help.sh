@@ -10,6 +10,7 @@ case "$flag" in
     printf "/-fz    --file      check type of the file.\n"
     printf "/-cp    --copy      copy files and directories with progess verbose.\n"
     printf "/-rm    --remove    safe remove files and directories.\n\n"
+    printf "/-cv    --convert   convert file types"
 
     printf "/-ex    --expose    EXPOSING local service or file-system to the Internet.\n"
     printf "/-hw    --hardware  handle the hardware parts.\n"
@@ -67,8 +68,13 @@ case "$flag" in
     printf "example[0]: $ laxz -genpw -{length: 2,4,8,16... 2_pow_anything}\n"
     printf "\n"
 ;;
+--hardware)
+    printf "\n"
+    printf "[help]: laxz's hardware help.\n"
+    printf "\-m {value 0.5~1} =: monitor brightness."
+    printf "\n"
+;;
 *)
-    printf "Internal ERROR.\n"
     printf "\n"
     printf "No help for $flag.\n"
     printf "\n"

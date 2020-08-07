@@ -4,9 +4,9 @@
 #If you would like to use Docker as a non-root user,
 #sudo usermod -aG docker your-user
 #command-not-found distro-info-data file iso-codes libexpat1 libgdbm6 libmagic-mgc libmagic1 libmpdec2 libpython3-stdlib
-  libpython3.8-minimal libpython3.8-stdlib libreadline8 libsqlite3-0 libssl1.1 lsb-release mime-support python-apt-common python3
-  python3-apt python3-commandnotfound python3-gdbm python3-minimal python3.8 python3.8-minimal readline-common xz-utils
-prefix=/home/$USER/git-in-sync/workspace-bash/daily-bash
+#  libpython3.8-minimal libpython3.8-stdlib libreadline8 libsqlite3-0 libssl1.1 lsb-release mime-support python-apt-common python3
+#  python3-apt python3-commandnotfound python3-gdbm python3-minimal python3.8 python3.8-minimal readline-common xz-utils
+prefix=$HOME/labs/code-space/workspace-bash/daily-bash
 config_file=$prefix/laxz_config
 AESKEY=$prefix/symme.key
 iFunc=$prefix/iFunc.sh
@@ -86,28 +86,24 @@ else
     stVar=$1 #**variable handling**
     ndVar=$2
     rdVar=$3
-
+#TODO convert/ version 1.0.4
     case "$stVar" in
+    -ff | --ffmpeg) stVar="--ffmpeg";;
     -hw | --hardware) stVar="--hardware" ;;
-    -ec | --encrypt) stVar="--encrypt" ;;
-    -dc | --decrypt) stVar="--decrypt" ;;
     -nw | --network) stVar="--network" ;;
-    -zz | --zip) stVar="--zip" ;;
-    -genpw | --generate) stVar="--generate" ;;
+    -cry| --crytography) stVar="--crytography" ;;
+    -ex | --expose) stVar="--expose" ;;
+
     # -pk | --package) stVar="--package" ;;
     # -vm | --virtual) stVar="--virtual" ;;
     # -mn | --mount) stVar="--mount" ;;
-    -rm | --remove) stVar="--remove" ;;
-    -cp | --copy) stVar="--copy" ;;
-    -ex | --expose) stVar="--expose" ;;
-    -tm | --timer) stVar="--timer";;
+
     --help) stVar="--help" ;;
     --version) stVar="--version" ;;
-    --reset) stVar="--reset" ;;
-    --status) stVar="--status" ;;
-    --sync) stVar="--sync" ;;
-    --thanks) stVar="--thanks" ;;
     --developer) stVar="--developer" ;;
+    --thanks) stVar="--thanks" ;;
+    --reset) stVar="--reset" ;;
+
     *) printf "[--help] for usage.\n" ;;
     esac
 
@@ -122,7 +118,48 @@ else
         fi
         ;;
     --reset) printf "Reset laxz.\n" ;;
-    --status) printf "Brightess is $brightness\n" ;;
+    ###PERMANENT###
+    --hardware)
+        if [[ $ndVar == --[hH]* || $ndVar == "" ]]; then
+            bash $prefix/global-help.sh $stVar
+        else
+            case "$ndVar" in
+            -m | --monitor)
+                bash $iFunc $stVar "--monitor" $rdVar
+                ;;
+            *)
+                #not controlable hardware part.
+                errOut $stVar $ndVar
+                ;;
+            esac
+        fi
+        ;;
+    --network)
+        if [[ $ndVar == --[hH]* ]]; then
+            bash $prefix/global-help.sh $stVar
+        elif [[ $ndVar == "" ]]; then
+            errOut $stVar $ndVar
+        else
+            case "$ndVar" in
+            -i | --internet)  bash $iFunc $stVar "--internet" ;;
+            -s | --speed) bash $iFunc $stVar "--speed" ;;
+            *) 
+            printf "\-i \-s \n"
+            errOut $stVar $ndVar ;;
+            esac
+        fi
+        ;;
+    --crytography)
+        if [[ $ndVar == --[hH]* || $ndVar == "" ]]; then
+            bash $prefix/global-help.sh $stVar
+        else
+            case "$ndVar" in
+            -e | --encrypt) printf "encryption" ;;
+            -d | --decrypt) printf "decryption" ;;
+            *) printf "not an option for cryptography" ;;
+            esac
+        fi
+        ;;
     --sync)
         xrandr --output $(xrandr -q | grep ' connected' | head -n 1 | cut -d ' ' -f1) --brightness $brightness
         printf "all settings in sync.\n"
@@ -166,37 +203,9 @@ else
         ;;
     --zip) zipper $* ;;
 
-    --hardware)
-        if [[ $ndVar == --[hH]* || $ndVar == "" ]]; then
-            bash $prefix/global-help.sh $stVar
-        else
-            case "$ndVar" in
-            -m | --monitor)
-                bash $iFunc $stVar "--monitor" $rdVar
-                ;;
-            *)
-                #not controlable hardware part.
-                errOut $stVar $ndVar
-                ;;
-            esac
-        fi
-        ;;
 
-    --network)
-        if [[ $ndVar == --[hH]* ]]; then
-            bash $prefix/global-help.sh $stVar
-        elif [[ $ndVar == "" ]]; then
-            errOut $stVar $ndVar
-        else
-            case "$ndVar" in
-            -i)  bash $iFunc $stVar "--internet" ;;
-            -s) bash $iFunc $stVar "--speed" ;;
-            *) 
-            printf "\-i \-s \n"
-            errOut $stVar $ndVar ;;
-            esac
-        fi
-        ;;
+
+
     --package) bash $prefix/package-handling.sh ;;
     --virtual) bash $prefix/vm-handling.sh ;;
     --remove)
