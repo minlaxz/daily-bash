@@ -4,7 +4,7 @@
 set -e
 
 lxz_path=$HOME/.local/share/lxz.gosh
-lxz_tmp=$lxz_path/tmp
+lxz_tmp=$HOME/.local/share/lxz.tmp
 
 exit_tasks() {
     echo ' > ::("Exiting")'
@@ -22,7 +22,7 @@ not_option(){
 _lxz_installer(){
     helper lxz_installer
     git clone https://github.com/minlaxz/daily-bash.git $lxz_path
-    if [[ $SHELL == /usr/bin/zsh ]];then
+    if [[ $SHELL == /usr/bin/zsh ]]; then
     echo "alias lxz=$HOME/.local/share/lxz.gosh/lxz.sh" >> ~/.zshrc 
     source ~/.zshrc
     else
