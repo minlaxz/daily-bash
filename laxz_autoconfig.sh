@@ -23,10 +23,10 @@ _lxz_installer(){
     helper lxz_installer
     git clone https://github.com/minlaxz/daily-bash.git $lxz_path
     if [[ $SHELL == /usr/bin/zsh ]]; then
-    echo "alias lxz=$HOME/.local/share/lxz.gosh/lxz.sh" >> ~/.zshrc 
+    echo "alias lxz='$HOME/.local/share/lxz.gosh/lxz.sh'" >> ~/.zshrc 
     source ~/.zshrc
     else
-    echo "alias lxz=$HOME/.local/share/lxz.gosh/lxz.sh" >> ~/.bashrc 
+    echo "alias lxz='$HOME/.local/share/lxz.gosh/lxz.sh'" >> ~/.bashrc 
     source ~/.bashrc
     fi
     _lxz_checker

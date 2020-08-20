@@ -6,7 +6,7 @@ config_file=$prefix/lxz_config
 AESKEY=$prefix/symme.key
 iFunc=$prefix/iFunc.sh
 now=$(date "+%Y-%m-%d-%T")
-version='1.2.1' # version  -- [main.mijor.minor]
+version='1.2.2' # version  -- [main.mijor.minor]
 developer='minlaxz'
 
 if [[ ! -f $config_file ]]; then
