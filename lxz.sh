@@ -1,11 +1,12 @@
 #!/bin/bash
 
-prefix=$HOME/labs/code-space/workspace-bash/daily-bash
+prefix=$HOME/.local/share/lxz.gosh
+lxz_tmp=$lxz_path/tmp
 config_file=$prefix/lxz_config
 AESKEY=$prefix/symme.key
 iFunc=$prefix/iFunc.sh
 now=$(date "+%Y-%m-%d-%T")
-version='1.2.0' # version  -- [main.mijor.minor]
+version='1.2.1' # version  -- [main.mijor.minor]
 developer='minlaxz'
 
 if [[ ! -f $config_file ]]; then
@@ -71,9 +72,11 @@ sync() {
 
 generate_password(){
     length=$1
+    printf "password: $(openssl rand -base64 $length)\n"
     printf "length: $length\n"
-    passwd=`openssl rand -base64 $length`
-    printf "password: $passwd\n"
+}
+selfUpdate(){
+    git -C $prefix pull https://github.com/minlaxz/daily-bash.git
 }
 
 if [ $# -eq 0 ]; then
@@ -90,11 +93,6 @@ else
     -nw | --network) stVar="--network" ;;
     -cry| --crytography) stVar="--crytography" ;;
     -ex | --expose) stVar="--expose" ;;
-
-    # -pk | --package) stVar="--package" ;;
-    # -vm | --virtual) stVar="--virtual" ;;
-    # -mn | --mount) stVar="--mount" ;;
-
     --help) stVar="--help" ;;
     --version) stVar="--version" ;;
     --developer) stVar="--developer" ;;
@@ -107,6 +105,7 @@ else
     case "$stVar" in
     --help) bash $prefix/global-help.sh ;;
     --version) printf "$version\n" ;;
+    --update) selfUpdate ;;
     --developer)
         echo -e "\a"
         notify-send 'hidden option' 'Developed by minlaxz'

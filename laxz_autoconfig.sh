@@ -8,8 +8,8 @@ lxz_tmp=$lxz_path/tmp
 
 exit_tasks() {
     echo ' > ::("Exiting")'
-    if [[ -d $laxz_tmp ]]; then
-       rm -rvf $laxz_tmp && echo "lxz' tmp cleaned."
+    if [[ -d $lxz_tmp ]]; then
+       rm -rvf $lxz_tmp && echo "lxz' tmp cleaned."
     else echo "no tmp to clean."
     fi
     exit
@@ -49,14 +49,14 @@ _lxz_uninstaller() {
 }
 
 _lxz_checker(){
-    if [[ -d $lxz_path ]]; then
+    if [[ -f $lxz_path/lxz.sh ]]; then
         git -C $lxz_path pull https://github.com/minlaxz/daily-bash.git
         helper lxz_checker
     else 
         printf "\nlxz is not installed\n"
         read -p "Do you want to install ? y/[n] : " u
         if [[ $u == y ]]; then
-            echo "installing... lxz"
+            _lxz_installer
         else 
             _lxz_
         fi
@@ -91,7 +91,7 @@ helper(){
         echo "x)exit."
         ;;
     lxz_installer)
-        echo " > lxz install is still building."
+        echo " > lxz - installing."
         ;;
     lxz_uninstaller)
         echo " > lxz uninstall is still building."
