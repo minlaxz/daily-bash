@@ -1,221 +1,107 @@
 #!/bin/sh
-# this is coded by minlaxz `github.com/minlaxz`
-# you can change whatever you want to!
-# cuDNN CUDA Nvidia -> https://docs.nvidia.com/deeplearning/sdk/cudnn-install/index.html#installlinux-tar
+# by minlaxz `https://github.com/minlaxz`
+
 set -e
 
-laxz_path=$HOME/.local/share/laxz
-laxz_tmp=$laxz_path/tmp
-hss_path=$laxz_path/hss
+lxz_path=$HOME/.local/share/lxz.gosh
+lxz_tmp=$lxz_path/tmp
 
-do_exit_tasks() {
+exit_tasks() {
+    echo ' > ::("Exiting")'
     if [[ -d $laxz_tmp ]]; then
-        rm -rvf $laxz_tmp && echo "cleaned."
+       rm -rvf $laxz_tmp && echo "lxz' tmp cleaned."
+    else echo "no tmp to clean."
+    fi
+    exit
+}
+
+not_option(){
+    echo " > ::Not an option."
+}
+
+_lxz_installer(){
+    helper lxz_installer
+    git clone https://github.com/minlaxz/daily-bash.git $lxz_path
+    if [[ $SHELL == /usr/bin/zsh ]];then
+    echo "alias lxz=$HOME/.local/share/lxz.gosh/lxz.sh" >> ~/.zshrc 
+    source ~/.zshrc
+    else
+    echo "alias lxz=$HOME/.local/share/lxz.gosh/lxz.sh" >> ~/.bashrc 
+    source ~/.bashrc
+    fi
+    _lxz_checker
+    
+}
+
+_lxz_uninstaller() {
+    helper lxz_uninstaller
+    if [[ -d $lxz_path ]]; then
+        read -p "Do you want to uninstall ? y/[n] :" u
+        if [[ $u == y ]];then
+            rm -rvf $lxz_path
+            echo "lxz cleaned."
+        else echo "Cancled."
+        fi
+    else 
+        echo "lxz is not installed."
+    fi
+    
+}
+
+_lxz_checker(){
+    if [[ -d $lxz_path ]]; then
+        git -C $lxz_path pull https://github.com/minlaxz/daily-bash.git
+        helper lxz_checker
+    else 
+        printf "\nlxz is not installed\n"
+        read -p "Do you want to install ? y/[n] : " u
+        if [[ $u == y ]]; then
+            echo "installing... lxz"
+        else 
+            _lxz_
+        fi
     fi
 }
 
-cuda_install() {
-    echo "cuda installation."
-    if [ -z $(sudo dpkg -l | grep Nvidia)]; then
-        echo "Nvidia driver not found!"
-        echo "[check driver]: sudo dpkg -l | grep Nvidia"
-        echo "[check hardware]: lspci | grep -i nvidia"
-    fi
-    wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/cuda-ubuntu1804.pin
-    sudo mv cuda-ubuntu1804.pin /etc/apt/preferences.d/cuda-repository-pin-600
-    sudo apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/7fa2af80.pub
-    sudo add-apt-repository "deb http://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/ /"
-    sudo apt update
-    sudo apt install cuda
-    echo "export LD_LIBRARY_PATH=/usr/local/cuda-11.0/lib64${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}" >>$laxz_tmp/activate
-    echo "export PATH=/usr/local/cuda-11.0/bin${PATH:+:${PATH}}" >>$laxz_tmp/activate
-}
-
-cudnn_install() {
-    echo "cudnn installation."
-    wget https://black-moon-3dba.gdindex-laxz.workers.dev/cuDNNv7.6.4Sep2719CUDA10.1/cudnn-10.1-linux-x64-v7.6.4.38.tgz
-    tar -xzvf cudnn-10.1-linux-x64-v7.6.4.38.tgz
-    sudo mv cuda/include/cudnn*.h /usr/local/cuda/include
-    sudo cp cuda/lib64/libcudnn* /usr/local/cuda/lib64
-    sudo chmod a+r /usr/local/cuda/include/cudnn*.h /usr/local/cuda/lib64/libcudnn*
-    sudo rm -rf ./cuda
-}
-
-opencv_install() {
-    echo "installing required build dependencies."
-    sudo apt install cmake gcc g++ git ffmpeg
-    echo "to support python3."
-    sudo apt install python3-dev python3-numpy
-    echo "GTK support for GUI features, Camera support (v4l), Media Support (ffmpeg, gstreamer) etc."
-    sudo apt install libavcodec-dev libavformat-dev libswscale-dev
-    sudo apt install libgstreamer-plugins-base1.0-dev libgstreamer1.0-dev
-    echo "to support gtk3"
-    sudo apt install libgtk-3-dev
-    echo "optional Dependencies"
-    sudo apt install libpng-dev libjpeg-dev libopenexr-dev libtiff-dev libwebp-dev
-
-    echo "Downaloading openCV..."
-    git clone https://github.com/opencv/opencv.git
-    cd opencv && mkdir build && cd build
-    cmake ../
-    make -j2
-    sudo make install
-    echo "https://github.com/pjreddie/darknet/issues/1886#issuecomment-547668240 > "
-    sudo apt install libopencv-dev
-    echo "opencv version: "
-    python3 -c "import cv2 as cv; print(cv.__version__)"
-    echo "you can install opencv in conda env _python_."
-    echo "conda create --name mlearn python=3 && conda activate mlearn && pip install opencv-python"
-}
-
-miniconda_install() {
-    echo "Miniconda installation."
-    wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
-    chmod a+x ./Miniconda3-latest-Linux-x86_64.sh
-    sh ./Miniconda3-latest-Linux-x86_64.sh
-}
-
-# activate_for_ml() {
-#     echo "cudnn, cuda will be only ava in this session only"
-#     source /home/$USER/.laxz_ml_profile
-# }
-
-# workspace_fix() {
-#     #detail in `laxz-dilemma`
-#     gsettings set org.gnome.shell.app-switcher current-workspace-only true
-#     gsettings set org.gnome.shell.extensions.dash-to-dock isolate-workspaces true
-# }
-
-installOne() {
-    sudo apt install build-essentials net-tools \
-        cmake gcc g++ python3-dev git \
-        vim curl wget \ 
-}
-
-installTwo(){
-    sudo apt install xsel imwheel gvfs-fuse kazam exfat-fuse
-    echo "install vbox, viber, slack, telegram, gnome-tweak-tool, chrome-gnome-shell"
-    echo "https://extensions.gnome.org/extension/779/clipboard-indicator/"
-    echo "https://extensions.gnome.org/extension/690/easyscreencast/"
-    echo "https://extensions.gnome.org/extension/750/openweather/"
-    echo "https://extensions.gnome.org/extension/708/panel-osd/"
-    echo "https://extensions.gnome.org/extension/234/steal-my-focus/"
-    echo "ZSH installation."
-    sudo apt install zsh curl
-    sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
-    git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
-    sed -i "s/plugins=[^ ]*/plugins=(git zsh-autosuggestions)/" /home/$USER/.zshrc
-    miniconda_install
-}
-
-installThree(){
-    echo "This may take several minutes."
-    # opencv_install
-    # cuda_install
-    # cudnn_install
-}
-
-software_installer() {
-    echo ""
-    echo "--install options--"
-    echo ""
-    echo "laxz)    --laxz's sys handler" #
-    echo "one)     --general dependencies" ##
-    echo "two)     --setup for general workspace" #
-    echo "three)   --setup for machine learning"
-    echo "menu)    --back to main menu."
-    echo ""
-    read -p "choose what do you want to install: " userChoice
-    case "$userChoice" in 
-    laxz)
-        echo "laxz installation is still building."
-        ;;
-    one)
-        echo "installing general dependencies."
-        installOne
-        ;;
-    two)
-        echo "Workspace installation."
-        installTwo
-        ;;
-    three)
-        echo "Machine Learning Workplace Installation."
-        installThree
-        ;;
-    *)
-        echo "not an option."
-    esac
-
-}
-
-service_installer() {
-    echo "service installer."
-}
-
-master_installer() {
-    echo ""
-    echo "what I can do -- "
-    echo "1)-sf      --software        call software installer."
-    echo "2)-sv      --service         call service installer."
-    echo "3)-r       --return          return to main menu and exit."
-    read -p "which do you want to install: " userChoice
-    case "$userChoice" in
-    -sf | 1 | --software)
-        echo "handling over to software installer."
-        software_installer
-        ;;
-    -sv | 2 | --service)
-        echo "handling over to service installer."
-        service_installer
-        ;;
-    -r | 4 | --return)
-        echo "return to main menu."
-        main
-        ;;
-    *)
-        echo "abort, <$userChoice> not an option."
-        master_installer
-        ;;
-    esac
-
-}
-
-master_uninstaller() {
-    echo "still ongoing. TODO"
-    #rm -rvf $laxz_path
-}
-
-main() {
-    echo ""
-    echo -e "\e[1;31m--Welcome to laxz--\e[0m"
-    echo ""
-    echo "1)-i  --install        install required softwares or services."
-    echo "2)-u  --uninstall      uninstall..."
-    echo "3)-e  --adios          exit and clean everything."
-    echo ""
-    read -p "choose an option: " opt
-    #options=("install" "uninstall" "Adios")
-    #PS3="choose an option:1/2/3:"
-    #select opt in "${options[@]}"; do
-    case "$opt" in
-        -i | 1 | --[iI]* )
-            master_installer
-            ;;
-        -u | 2 | --[uU]* )
-            master_uninstaller
-            ;;
-        -e | 3 | --[Aa]* )
-            # echo "you chose $REPLY which is $opt !" 
-            echo '("Exit")'
-            #do_exit_tasks
-            #break
-            ;;
-        *)
-            echo " choose an option: 1 or 2 or 3 "
-            echo "visit https://minlaxz.web.app/init.html for detail."
-            echo "Not an option <$opt>."
-            ;;
+_lxz_() {
+    helper lxz_help
+    read -p " what do you say x3 : " u
+    case "$u" in
+        1 | --[i]* ) _lxz_installer ;;
+        2 | --[u]* ) _lxz_uninstaller ;;
+        3 | --[c]* ) _lxz_checker ;;
+        x | --[x]* ) exit_tasks ;;
+        *)  not_option
+            echo " > ::<$u>.Choose: 1/2.. "
+            echo " > ::visit https://minlaxz.me for detail."
+            echo ""
+            _lxz_ ;;
         esac
-    #done
 }
-main
+
+helper(){
+    case $1 in 
+    lxz_help)
+        echo ""
+        echo -e "\e[1;31m--lxz installer--\e[0m"
+        echo ""
+        echo "1)in..."
+        echo "2)un..."
+        echo "3)cxk..."
+        echo "x)exit."
+        ;;
+    lxz_installer)
+        echo " > lxz install is still building."
+        ;;
+    lxz_uninstaller)
+        echo " > lxz uninstall is still building."
+        ;;
+    lxz_checker)
+        echo " > lxz updated."
+        ;;
+    *)
+        echo "Enternal Arror OwO"
+        ;;
+    esac
+}
+_lxz_

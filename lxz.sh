@@ -1,17 +1,11 @@
 #!/bin/bash
-#apt-cache madison docker-ce
-#List the versions available in your repo:
-#If you would like to use Docker as a non-root user,
-#sudo usermod -aG docker your-user
-#command-not-found distro-info-data file iso-codes libexpat1 libgdbm6 libmagic-mgc libmagic1 libmpdec2 libpython3-stdlib
-#  libpython3.8-minimal libpython3.8-stdlib libreadline8 libsqlite3-0 libssl1.1 lsb-release mime-support python-apt-common python3
-#  python3-apt python3-commandnotfound python3-gdbm python3-minimal python3.8 python3.8-minimal readline-common xz-utils
+
 prefix=$HOME/labs/code-space/workspace-bash/daily-bash
-config_file=$prefix/laxz_config
+config_file=$prefix/lxz_config
 AESKEY=$prefix/symme.key
 iFunc=$prefix/iFunc.sh
 now=$(date "+%Y-%m-%d-%T")
-version='1.1.3'
+version='1.2.0' # version  -- [main.mijor.minor]
 developer='minlaxz'
 
 if [[ ! -f $config_file ]]; then
@@ -22,10 +16,13 @@ if [[ ! -f $config_file ]]; then
     echo "brightness=1" >>$config_file
     printf "CONFIG File created.\n"
 fi
+
+# printf "last used $last_used.\n"
+sed -i "s/last_used=[^ ]*/last_used=$now/" $config_file
+sed -i "s/version=[^ ]*/version=$version/" $config_file
+
 source $config_file
 
-printf "last used $last_used.\n"
-sed -i "s/last_used=[^ ]*/last_used=$now/" $config_file
 
 errOut() {
     errFlag=$1
