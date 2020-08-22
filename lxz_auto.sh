@@ -1,36 +1,42 @@
 #!/bin/sh
-# by minlaxz `https://github.com/minlaxz`
-
-set -e
+# bash by minlaxz `https://github.com/minlaxz`
 
 lxz_path=$HOME/.local/share/lxz.gosh
 lxz_tmp=$HOME/.local/share/lxz.tmp
 
 exit_tasks() {
-    echo ' > ::("Exiting")'
+    echo '("Exiting")'
     if [[ -d $lxz_tmp ]]; then
        rm -rvf $lxz_tmp && echo "lxz' tmp cleaned."
     else echo "no tmp to clean."
     fi
-    exit
-}
-
-not_option(){
-    echo " > ::Not an option."
 }
 
 _lxz_installer(){
     helper lxz_installer
     git clone https://github.com/minlaxz/daily-bash.git $lxz_path
+
+    #configure
     if [[ $SHELL == /usr/bin/zsh ]]; then
-    echo "alias lxz='$HOME/.local/share/lxz.gosh/lxz.sh'" >> ~/.zshrc 
-    source ~/.zshrc
+        if grep -Fxq 'alias lxz="$HOME/.local/share/lxz.gosh/lxz.sh"' ~/.zshrc
+        then
+	        echo "lxz - found"
+        else
+	        echo "lxz - not found"
+            echo "alias lxz='$HOME/.local/share/lxz.gosh/lxz.sh'" >> ~/.zshrc 
+            source ~/.zshrc
+        fi
     else
-    echo "alias lxz='$HOME/.local/share/lxz.gosh/lxz.sh'" >> ~/.bashrc 
-    source ~/.bashrc
+        if grep -Fxq 'alias lxz="$HOME/.local/share/lxz.gosh/lxz.sh"' ~/.bashrc
+        then
+	        echo "lxz - found"
+        else
+	        echo "lxz - not found"
+            echo "alias lxz='$HOME/.local/share/lxz.gosh/lxz.sh'" >> ~/.bashrc 
+            source ~/.bashrc
+        fi
     fi
-    _lxz_checker
-    
+    exit_tasks
 }
 
 _lxz_uninstaller() {
@@ -39,28 +45,13 @@ _lxz_uninstaller() {
         read -p "Do you want to uninstall ? y/[n] :" u
         if [[ $u == y ]];then
             rm -rvf $lxz_path
-            echo "lxz cleaned."
+            echo "lxz - removed."
         else echo "Cancled."
         fi
     else 
-        echo "lxz is not installed."
+        echo "lxz is not installed already."
     fi
     
-}
-
-_lxz_checker(){
-    if [[ -f $lxz_path/lxz.sh ]]; then
-        git -C $lxz_path pull https://github.com/minlaxz/daily-bash.git
-        helper lxz_checker
-    else 
-        printf "\nlxz is not installed\n"
-        read -p "Do you want to install ? y/[n] : " u
-        if [[ $u == y ]]; then
-            _lxz_installer
-        else 
-            _lxz_
-        fi
-    fi
 }
 
 _lxz_() {
@@ -69,11 +60,9 @@ _lxz_() {
     case "$u" in
         1 | --[i]* ) _lxz_installer ;;
         2 | --[u]* ) _lxz_uninstaller ;;
-        3 | --[c]* ) _lxz_checker ;;
         x | --[x]* ) exit_tasks ;;
-        *)  not_option
-            echo " > ::<$u>.Choose: 1/2.. "
-            echo " > ::visit https://minlaxz.me for detail."
+        *)  echo " ./Not an option <$u>.Choose: 1/2.. "
+            echo " > ::visit https://daemon-laxz.web.app for details."
             echo ""
             _lxz_ ;;
         esac
@@ -84,23 +73,18 @@ helper(){
     lxz_help)
         echo ""
         echo -e "\e[1;31m--lxz installer--\e[0m"
-        echo ""
-        echo "1)in..."
-        echo "2)un..."
-        echo "3)cxk..."
+        echo "1)install."
+        echo "2)uninstall."
         echo "x)exit."
         ;;
     lxz_installer)
         echo " > lxz - installing."
         ;;
     lxz_uninstaller)
-        echo " > lxz uninstall is still building."
-        ;;
-    lxz_checker)
-        echo " > lxz updated."
+        echo " > lxz - removing."
         ;;
     *)
-        echo "Enternal Arror OwO"
+        echo "Enternal Arror \OwO/"
         ;;
     esac
 }

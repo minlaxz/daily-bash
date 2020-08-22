@@ -2,27 +2,27 @@
 
 prefix=$HOME/.local/share/lxz.gosh
 lxz_tmp=$lxz_path/tmp
-config_file=$prefix/lxz_config
+lxz_logs=$prefix/lxz_log
 AESKEY=$prefix/symme.key
 iFunc=$prefix/iFunc.sh
 now=$(date "+%Y-%m-%d-%T")
-version='1.2.2' # version  -- [main.mijor.minor]
+version='1.3.0' # version  -- [main.mijor.minor]
 developer='minlaxz'
 
-if [[ ! -f $config_file ]]; then
-    touch $config_file
-    echo "last_used=$now" >>$config_file
-    echo "developer=$developer" >>$config_file
-    echo "version=$version" >>$config_file
-    echo "brightness=1" >>$config_file
+if [[ ! -f $lxz_logs ]]; then
+    touch $lxz_logs
+    echo "last_used=$now" >>$lxz_logs
+    echo "developer=$developer" >>$lxz_logs
+    echo "version=$version" >>$lxz_logs
+    echo "brightness=1" >>$lxz_logs
     printf "CONFIG File created.\n"
 fi
 
 # printf "last used $last_used.\n"
-sed -i "s/last_used=[^ ]*/last_used=$now/" $config_file
-sed -i "s/version=[^ ]*/version=$version/" $config_file
+sed -i "s/last_used=[^ ]*/last_used=$now/" $lxz_logs
+sed -i "s/version=[^ ]*/version=$version/" $lxz_logs
 
-source $config_file
+source $lxz_logs
 
 
 errOut() {
