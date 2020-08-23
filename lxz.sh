@@ -6,15 +6,15 @@ lxz_logs=$prefix/lxz_log
 AESKEY=$prefix/symme.key
 iFunc=$prefix/iFunc.sh
 now=$(date "+%Y-%m-%d-%T")
-version='1.3.0' # version  -- [main.mijor.minor]
+version='2.0.0' # version  -- [main.mijor.minor]
 developer='minlaxz'
 
 if [[ ! -f $lxz_logs ]]; then
     touch $lxz_logs
-    echo "last_used=$now" >>$lxz_logs
-    echo "developer=$developer" >>$lxz_logs
-    echo "version=$version" >>$lxz_logs
-    echo "brightness=1" >>$lxz_logs
+    echo "last_used=$now" >> $lxz_logs
+    echo "developer=$developer" >> $lxz_logs
+    echo "version=$version" >> $lxz_logs
+    echo "brightness=1" >> $lxz_logs
     printf "CONFIG File created.\n"
 fi
 
@@ -31,7 +31,7 @@ errOut() {
     errReason=$3
 
     printf "Not an option.\n"
-    printf "laxz $errFlag --help\n"
+    printf "lxz $errFlag --help\n"
 }
 
 integrity() {
@@ -80,90 +80,73 @@ selfUpdate(){
 }
 
 if [ $# -eq 0 ]; then
-    printf "[--help] for usage.\n"
-    printf "[--version] check version.\n"
+    printf "[--help | -h] for usage.\n"
+    printf "[--version | -v] check version.\n"
 else
-    stVar=$1 #**variable handling**
-    ndVar=$2
-    rdVar=$3
-#TODO convert/ version 1.0.4
-    case "$stVar" in
-    -ff | --ffmpeg) stVar="--ffmpeg";;
-    -hw | --hardware) stVar="--hardware" ;;
-    -nw | --network) stVar="--network" ;;
-    -cry| --crytography) stVar="--crytography" ;;
-    -ex | --expose) stVar="--expose" ;;
-    --help) stVar="--help" ;;
-    --version) stVar="--version" ;;
-    --developer) stVar="--developer" ;;
-    --thanks) stVar="--thanks" ;;
-    --reset) stVar="--reset" ;;
-
-    *) printf "[--help] for usage.\n" ;;
-    esac
+    stVar=$1 #major
+    ndVar=$2 #monir
+    rdVar=$3 #in-case
 
     case "$stVar" in
-    --help) bash $prefix/global-help.sh ;;
-    --version) printf "$version\n" ;;
+    --help | -h) bash $prefix/global-help.sh ;;
+    --version | -v) printf "$version\n" ;;
     --update) selfUpdate ;;
-    --developer)
-        echo -e "\a"
-        notify-send 'hidden option' 'Developed by minlaxz'
-        if [[ $ndVar == --[hH]* ]]; then
-            bash $prefix/global-help.sh $stVar
-        fi
-        ;;
-    --reset) printf "Reset laxz.\n" ;;
-    ###PERMANENT###
-    --hardware)
+    --developer | -dev) notify-send 'hidden option' 'Developed by minlaxz' ;;
+
+    --demo) bash $prefix/install_universe.sh ;;
+
+    --hardware | -hw)
         if [[ $ndVar == --[hH]* || $ndVar == "" ]]; then
-            bash $prefix/global-help.sh $stVar
+            bash $prefix/global-help.sh "--hardware"
         else
             case "$ndVar" in
             -m | --monitor)
                 bash $iFunc $stVar "--monitor" $rdVar
                 ;;
-            *)
-                #not controlable hardware part.
-                errOut $stVar $ndVar
+            -info | --info)
+                bash $iFunc $stVar "--info"
+                ;;
+            *)  printf "Error.\n Options : \n"
+                printf "-m monitor\n"
+                printf "-info information\n"  
                 ;;
             esac
         fi
         ;;
-    --network)
+    --network | -nw)
         if [[ $ndVar == --[hH]* ]]; then
-            bash $prefix/global-help.sh $stVar
+            bash $prefix/global-help.sh "--network"
         elif [[ $ndVar == "" ]]; then
             errOut $stVar $ndVar
         else
             case "$ndVar" in
             -i | --internet)  bash $iFunc $stVar "--internet" ;;
             -s | --speed) bash $iFunc $stVar "--speed" ;;
-            *) 
-            printf "\-i \-s \n"
-            errOut $stVar $ndVar ;;
+            *)  printf "Error.\n Options : \n"
+                printf "-i internet\n"
+                printf "-s speed\n"  
+                ;;
             esac
         fi
         ;;
-    --crytography)
+    --crytography | -cry)
         if [[ $ndVar == --[hH]* || $ndVar == "" ]]; then
             bash $prefix/global-help.sh $stVar
         else
             case "$ndVar" in
             -e | --encrypt) printf "encryption" ;;
             -d | --decrypt) printf "decryption" ;;
-            *) printf "not an option for cryptography" ;;
+            *)  printf "Error.\n Options : \n"
+                printf "-e encrypt\n"
+                printf "-d decrypt\n"  
+                ;;
             esac
         fi
         ;;
-    --sync)
-        xrandr --output $(xrandr -q | grep ' connected' | head -n 1 | cut -d ' ' -f1) --brightness $brightness
-        printf "all settings in sync.\n"
-        ;;
-    --test)
-        printf "third arg is : ${!3}\n"
-        #printf "third arg is : ${@:3}"
-        ;;
+    # --test)
+    #     printf "third arg is : ${!3}\n"
+    #     #printf "third arg is : ${@:3}"
+    #     ;;
     --expose)
         if [[ $ndVar == --[hH]* ]]; then
             bash $prefix/global-help.sh $stVar
@@ -242,10 +225,6 @@ else
         else
             generate_password $ndVar
         fi
-        
-        ;;
-    --thanks)
-        bash $prefix/thanks.sh
         ;;
     esac
 fi

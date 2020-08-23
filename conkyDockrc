@@ -1,0 +1,73 @@
+conky.config = {	
+	update_interval = 1,
+	cpu_avg_samples = 4,
+	net_avg_samples = 3,
+	out_to_console = false,
+	override_utf8_locale = true,
+	double_buffer = true,
+	no_buffers = true,
+	text_buffer_size = 32768,
+	imlib_cache_size = 0,
+	own_window = true,
+	own_window_type = 'panel',
+	own_window_argb_visual = true,
+	own_window_argb_value = 0,
+	own_window_hint = 'undecorated,above,sticky,skip_taskbar,skip_pager',
+	border_inner_margin = 0,
+	border_outer_margin = 0,
+	xinerama_head = 1,
+	alignment = 'buttom_left',
+	gap_x = 10,
+	gap_y = 20,
+	draw_shades = false,
+	draw_outline = false,
+	draw_borders = false,
+	default_border_color = 'red',
+	draw_graph_borders = false,
+	use_xft = true,
+	font = 'Ubuntu Mono:size=11',
+	xftalpha = 0.8,
+	uppercase = false,
+	default_color = '#908080',
+	own_window_color = '#000000',
+	minimum_width = 45, minimum_height = 0
+
+};
+
+conky.text = [[
+${font sans-serif:bold:size=7}${color #F0F0F0}
+${time %d-%m-%y}
+ps -aux
+${execi 1000 ps aux | wc -l}${color}
+${color #66CDAA}CPUs
+${hwmon 1 temp 1}°C
+${cpu cpu1}%
+${cpu cpu2}%
+${cpu cpu3}%
+${cpu cpu4}%
+${cpu cpu5}%
+${cpu cpu6}%
+${cpu cpu7}%
+${cpu cpu8}%${color}
+${color cyan}RAM
+${memperc}%
+${memmax}
+SWAP
+${swapperc}%
+VRAM
+${exec nvidia-smi | grep % | cut -c 38-40}MB
+${execi 60 nvidia-settings -query [gpu:0]/GPUCoreTemp -t} °C
+DISK
+${fs_used_perc /}%
+Dokr
+${exec docker ps  | awk 'NR==2 {print $1}' | cut -c 1-6}
+${color}
+${color #D1E7D1}
+eno1::
+${downspeed eno1}
+${upspeed eno1}
+wlan::
+${downspeed wlxc8d719546fe4}  
+${upspeed wlxc8d719546fe4} 
+${color}${font}
+]];
