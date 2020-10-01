@@ -1,5 +1,8 @@
-#!/bin/sh
-# bash by minlaxz `https://github.com/minlaxz`
+#!/usr/bin/env sh
+# Purpose : Auto configure linux system
+#           & intented for machine learning.
+# Author : minlaxz
+# Note : This should be ran as lxz_init.sh
 
 lxz_path=$HOME/.local/share/lxz.gosh
 lxz_tmp=$HOME/.local/share/lxz.tmp
@@ -54,13 +57,23 @@ _lxz_uninstaller() {
     
 }
 
+_laxz_workspace(){
+    echo -e "j-1 processing -> \e[32mtransparent gnome dock\e[0m"
+    gsettings set org.gnome.shell.extensions.dash-to-dock customize-alphas true
+    gsettings set org.gnome.shell.extensions.dash-to-dock min-alpha
+    gsettings set org.gnome.shell.extensions.dash-to-dock max-alpha
+    echo -e "j-1 finished.\e[33;1mlogin required.\e[0m"
+    
+}
+
 _lxz_() {
     helper lxz_help
-    read -p " what do you say x3 : " u
+    read -p "\e[32m what do you say\e[0m :  " u
     case "$u" in
         1 | --[i]* ) _lxz_installer ;;
         2 | --[u]* ) _lxz_uninstaller ;;
-        x | --[x]* ) exit_tasks ;;
+        3 | --[x]* ) _laxz_workspace ;;
+        z) exit_tasks ;;
         *)  echo " ./Not an option <$u>.Choose: 1/2.. "
             echo " > ::visit https://daemon-laxz.web.app for details."
             echo ""
@@ -72,10 +85,11 @@ helper(){
     case $1 in 
     lxz_help)
         echo ""
-        echo -e "\e[1;31m--lxz installer--\e[0m"
-        echo "1)install."
-        echo "2)uninstall."
-        echo "x)exit."
+        echo -e "\e[1;32m--lxz installer--\e[0m"
+        echo "1)install lxz."
+        echo "2)uninstall lxz."
+        echo "3)setup 4me"
+        echo "z)exit."
         ;;
     lxz_installer)
         echo " > lxz - installing."
