@@ -59,10 +59,9 @@ _lxz_uninstaller() {
 
 _laxz_workspace(){
     echo -e "j-1 processing -> \e[32mtransparent gnome dock\e[0m"
-    gsettings set org.gnome.shell.extensions.dash-to-dock customize-alphas true
-    gsettings set org.gnome.shell.extensions.dash-to-dock min-alpha
-    gsettings set org.gnome.shell.extensions.dash-to-dock max-alpha
-    echo -e "j-1 finished.\e[33;1mlogin required.\e[0m"
+    gsettings set org.gnome.shell.extensions.dash-to-dock transparency-mode 'FIXED'
+    gsettings set org.gnome.shell.extensions.dash-to-dock background-opacity 0.2
+    echo -e "j-1 finished.\e[34;1mlogin not required.\e[0m"
     
 }
 
